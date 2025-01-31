@@ -23,6 +23,26 @@ up:
 down:
 	docker-compose down
 
+.PHONY: migration
+## migration name=?: create a new migration
+migration:
+	docker run --rm -v .:/migrations --network host migrate/migrate create -ext=sql -dir=/migrations/$(MIGRATIONS_PATH) -seq $(name)
+
+.PHONY: migrate-up
+## migrate-up: execute all migrations
+migrate-up:
+	docker run --rm -v .:/migrations --network host migrate/migrate -verbose -path=/migrations/$(MIGRATIONS_PATH) -database $(POSTGRES_URL) up
+
+.PHONY: migrate-down
+## migrate-down: revert all migrations
+migrate-down:
+	docker run --rm -v .:/migrations --network host migrate/migrate -verbose -path=/migrations/$(MIGRATIONS_PATH) -database $(POSTGRES_URL) down -all
+
+.PHONY: sql
+## sql: generate sql code
+sql:
+	docker run --rm -v .:/src -w /src sqlc/sqlc generate -f="./sqlc.yml"
+
 ## mock: generate mocks
 .PHONY: mock
 mock:
@@ -48,7 +68,6 @@ test/b:
 .PHONY: test/v
 test/v:
 	go test -v -race -failfast -buildvcs $(PACKAGES)
-
 
 ## run: run the application in watch mode
 .PHONY: run
