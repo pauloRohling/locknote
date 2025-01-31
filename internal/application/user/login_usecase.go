@@ -22,15 +22,15 @@ type LoginUsecaseParams struct {
 	UserRepository user.Repository
 }
 
-type LoginUsecase struct {
+type LoginUseCase struct {
 	LoginUsecaseParams
 }
 
-func NewLoginUsecase(params LoginUsecaseParams) *LoginUsecase {
-	return &LoginUsecase{params}
+func NewLoginUsecase(params LoginUsecaseParams) *LoginUseCase {
+	return &LoginUseCase{params}
 }
 
-func (usecase *LoginUsecase) Execute(ctx context.Context, input *LoginInput) (*LoginOutput, error) {
+func (usecase *LoginUseCase) Execute(ctx context.Context, input *LoginInput) (*LoginOutput, error) {
 	userEmail, err := email.NewEmail(input.Email)
 	if err != nil {
 		return nil, err
