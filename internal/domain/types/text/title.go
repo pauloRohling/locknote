@@ -24,11 +24,11 @@ func NewTitle(title string) (Title, error) {
 	title = strings.TrimSpace(title)
 	length := len(title)
 	if length == 0 {
-		return "", throw.Validation().Msg("title should not be empty")
+		return "", throw.Validation().Msg("should not be empty")
 	}
 
 	if length > 255 {
-		return "", throw.Validation().Msg("title length cannot exceed 255 characters")
+		return "", throw.Validation().Msg("should not exceed 255 characters")
 	}
 
 	return Title(title), nil
