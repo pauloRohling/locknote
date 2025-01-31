@@ -16,7 +16,7 @@ type Note struct {
 	audit   audit.Audit
 }
 
-func (note *Note) Id() id.ID {
+func (note *Note) ID() id.ID {
 	return note.id
 }
 

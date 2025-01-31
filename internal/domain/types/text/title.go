@@ -10,22 +10,26 @@ import (
 type Title string
 
 // String returns the string representation of the title
-func (name Title) String() string {
-	return string(name)
+func (title Title) String() string {
+	return string(title)
 }
 
 // MarshalJSON implements the [encoding/json.Marshaler] interface
-func (name Title) MarshalJSON() ([]byte, error) {
-	return json.Marshal(name.String())
+func (title Title) MarshalJSON() ([]byte, error) {
+	return json.Marshal(title.String())
 }
 
 // NewTitle creates a new [Title] from a string
-func NewTitle(name string) (Title, error) {
-	name = strings.TrimSpace(name)
-	length := len(name)
-	if length == 0 || length > 255 {
-		return "", throw.Validation().Msg("invalid naming length")
+func NewTitle(title string) (Title, error) {
+	title = strings.TrimSpace(title)
+	length := len(title)
+	if length == 0 {
+		return "", throw.Validation().Msg("title should not be empty")
 	}
 
-	return Title(name), nil
+	if length > 255 {
+		return "", throw.Validation().Msg("title length cannot exceed 255 characters")
+	}
+
+	return Title(title), nil
 }

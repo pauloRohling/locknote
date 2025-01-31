@@ -6,6 +6,7 @@ import (
 	"github.com/pauloRohling/locknote/internal/domain/audit"
 	"github.com/pauloRohling/locknote/internal/domain/types/id"
 	"github.com/pauloRohling/locknote/internal/domain/types/text"
+	"github.com/pauloRohling/throw"
 )
 
 // NewParams represents the necessary parameters for creating a new [note.Note]
@@ -61,6 +62,10 @@ func (factory *DefaultFactory) Parse(params ParseParams) (*Note, error) {
 	title, err := text.NewTitle(params.Title)
 	if err != nil {
 		return nil, err
+	}
+
+	if len(params.Content) == 0 {
+		return nil, throw.Validation().Msg("content should not be empty")
 	}
 
 	return &Note{
