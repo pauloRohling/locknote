@@ -35,6 +35,10 @@ func init() {
 
 	_ = cleanenv.ReadConfig(fileName, &env)
 	_ = cleanenv.ReadConfig(".env", &env)
+
+	if err := env.validateRequiredFields(); err != nil {
+		panic("Unable to read env.yml")
+	}
 }
 
 func showBanner() {
