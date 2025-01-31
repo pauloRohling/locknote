@@ -5,6 +5,7 @@ import (
 	"github.com/pauloRohling/locknote/internal/domain/user"
 	"github.com/pauloRohling/throw"
 	"github.com/stretchr/testify/assert"
+	"strings"
 	"testing"
 )
 
@@ -30,6 +31,60 @@ func TestFactory(t *testing.T) {
 				Name:  "Test User",
 				Email: "test@user.com",
 			},
+		},
+		"should not create a new user with an empty password": {
+			params: user.NewParams{
+				Name:     "Test User",
+				Email:    "test@user.com",
+				Password: "",
+			},
+			expectErr: true,
+			errType:   throw.ValidationErrorType,
+		},
+		"should not create a new user with a password less than 8 characters": {
+			params: user.NewParams{
+				Name:     "Test User",
+				Email:    "test@user.com",
+				Password: "test",
+			},
+			expectErr: true,
+			errType:   throw.ValidationErrorType,
+		},
+		"should not create a new user with a password more than 70 characters": {
+			params: user.NewParams{
+				Name:     "Test User",
+				Email:    "test@user.com",
+				Password: strings.Repeat("a", 71),
+			},
+			expectErr: true,
+			errType:   throw.ValidationErrorType,
+		},
+		"should not create a new user with an empty name": {
+			params: user.NewParams{
+				Name:     "",
+				Email:    "test@user.com",
+				Password: "test123456",
+			},
+			expectErr: true,
+			errType:   throw.ValidationErrorType,
+		},
+		"should not create a new user with an empty email": {
+			params: user.NewParams{
+				Name:     "Test User",
+				Email:    "",
+				Password: "test123456",
+			},
+			expectErr: true,
+			errType:   throw.ValidationErrorType,
+		},
+		"should not create a new user with an invalid email": {
+			params: user.NewParams{
+				Name:     "Test User",
+				Email:    "invalid@email.com",
+				Password: "test123456",
+			},
+			expectErr: true,
+			errType:   throw.ValidationErrorType,
 		},
 	}
 
