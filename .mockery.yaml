@@ -1,0 +1,13 @@
+with-expecter: True
+dir: "./internal/mocks/{{.PackageName}}"
+filename: "mock_{{.InterfaceName | snakecase}}.go"
+mockname: "Mock{{.InterfaceName}}"
+outpkg: "mock{{.PackageName}}"
+all: True
+packages:
+  github.com/pauloRohling/locknote/internal/domain/note:
+    config:
+      all: True
+  github.com/pauloRohling/locknote/internal/domain/user:
+    config:
+      all: True

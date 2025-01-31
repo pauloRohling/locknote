@@ -23,6 +23,11 @@ up:
 down:
 	docker-compose down
 
+## mock: generate mocks
+.PHONY: mock
+mock:
+	docker run --rm -v .:/src -w /src vektra/mockery:v2.51 --all
+
 ## test: run all tests
 .PHONY: test
 test:
