@@ -11,3 +11,6 @@ packages:
   github.com/pauloRohling/locknote/internal/domain/user:
     config:
       all: True
+  github.com/pauloRohling/locknote/internal/domain/token:
+    config:
+      all: True
