@@ -26,27 +26,27 @@ down:
 .PHONY: migration
 ## migration name=?: create a new migration
 migration:
-	docker run --rm -v .:/migrations --network host migrate/migrate create -ext=sql -dir=/migrations/$(MIGRATIONS_PATH) -seq $(name)
+	docker run --rm -u 1000:1000 -v .:/migrations --network host migrate/migrate create -ext=sql -dir=/migrations/$(MIGRATIONS_PATH) -seq $(name)
 
 .PHONY: migrate-up
 ## migrate-up: execute all migrations
 migrate-up:
-	docker run --rm -v .:/migrations --network host migrate/migrate -verbose -path=/migrations/$(MIGRATIONS_PATH) -database $(POSTGRES_URL) up
+	docker run --rm -u 1000:1000 -v .:/migrations --network host migrate/migrate -verbose -path=/migrations/$(MIGRATIONS_PATH) -database $(POSTGRES_URL) up
 
 .PHONY: migrate-down
 ## migrate-down: revert all migrations
 migrate-down:
-	docker run --rm -v .:/migrations --network host migrate/migrate -verbose -path=/migrations/$(MIGRATIONS_PATH) -database $(POSTGRES_URL) down -all
+	docker run --rm -u 1000:1000 -v .:/migrations --network host migrate/migrate -verbose -path=/migrations/$(MIGRATIONS_PATH) -database $(POSTGRES_URL) down -all
 
 .PHONY: sql
 ## sql: generate sql code
 sql:
-	docker run --rm -v .:/src -w /src sqlc/sqlc generate -f="./sqlc.yml"
+	docker run --rm -u 1000:1000 -v .:/src -w /src sqlc/sqlc generate -f="./sqlc.yml"
 
 ## mock: generate mocks
 .PHONY: mock
 mock:
-	docker run --rm -v .:/src -w /src vektra/mockery:v2.51 --all
+	docker run --rm -u 1000:1000 -v .:/src -w /src vektra/mockery:v2.51 --all
 
 ## test: run all tests
 .PHONY: test
