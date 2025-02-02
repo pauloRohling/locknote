@@ -31,7 +31,7 @@ func (controller *RestController) create(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, &CreateNoteResponse{
+	return c.JSON(http.StatusCreated, &CreateNoteResponse{
 		Note: response.Note,
 	})
 }

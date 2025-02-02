@@ -28,7 +28,7 @@ func (mapper *DefaultMapper) Parse(savedUser *store.User) (*user.User, error) {
 		return nil, err
 	}
 
-	return mapper.factory.Parse(user.ParseParams{
+	return mapper.factory.ParseWithEncryptedPassword(user.ParseParams{
 		ID:    savedUser.ID,
 		Audit: audit.New(savedUser.CreatedAt, createdBy),
 		NewParams: user.NewParams{

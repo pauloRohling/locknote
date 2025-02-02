@@ -33,7 +33,7 @@ func (controller *RestController) create(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, &CreateUserResponse{
+	return c.JSON(http.StatusCreated, &CreateUserResponse{
 		User: response.User,
 	})
 }

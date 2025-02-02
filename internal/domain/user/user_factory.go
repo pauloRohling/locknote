@@ -28,6 +28,7 @@ type ParseParams struct {
 type Factory interface {
 	New(ctx context.Context, params NewParams) (*User, error)
 	Parse(params ParseParams) (*User, error)
+	ParseWithEncryptedPassword(params ParseParams) (*User, error)
 }
 
 type DefaultFactory struct {
@@ -67,6 +68,36 @@ func (factory *DefaultFactory) Parse(params ParseParams) (*User, error) {
 	}
 
 	userPassword, err := password.New(params.Password)
+	if err != nil {
+		return nil, err
+	}
+
+	return &User{
+		id:       userId,
+		name:     userName,
+		email:    userEmail,
+		password: userPassword,
+		audit:    params.Audit,
+	}, nil
+}
+
+func (factory *DefaultFactory) ParseWithEncryptedPassword(params ParseParams) (*User, error) {
+	userId, err := id.FromUUID(params.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	userName, err := text.NewPersonName(params.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	userEmail, err := email.NewEmail(params.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	userPassword, err := password.FromEncrypted(params.Password)
 	if err != nil {
 		return nil, err
 	}

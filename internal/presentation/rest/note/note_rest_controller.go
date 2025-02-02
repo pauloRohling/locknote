@@ -16,7 +16,7 @@ func NewRestController(service note.Service) *RestController {
 
 func (controller *RestController) Register(api *echo.Group) {
 	notesApi := api.Group("/notes")
-	notesApi.POST("/", controller.create)
+	notesApi.POST("", controller.create)
 }
 
 // Ensure the controller implements the [rest.RegistrableRoute] interface

@@ -16,7 +16,7 @@ func NewRestController(service user.Service) *RestController {
 
 func (controller *RestController) Register(api *echo.Group) {
 	usersApi := api.Group("/users")
-	usersApi.POST("/", controller.create)
+	usersApi.POST("", controller.create)
 	usersApi.POST("/login", controller.login)
 }
 
