@@ -8,8 +8,8 @@ type Service interface {
 }
 
 type FacadeServiceParams struct {
-	CreateUsecase *CreateUserUseCase
-	LoginUsecase  *LoginUseCase
+	CreateUseCase *CreateUserUseCase
+	LoginUseCase  *LoginUseCase
 }
 
 type FacadeService struct {
@@ -21,11 +21,11 @@ func NewService(params FacadeServiceParams) *FacadeService {
 }
 
 func (service *FacadeService) Create(ctx context.Context, input *CreateUserInput) (*CreateUserOutput, error) {
-	return service.CreateUsecase.Execute(ctx, input)
+	return service.CreateUseCase.Execute(ctx, input)
 }
 
 func (service *FacadeService) Login(ctx context.Context, input *LoginInput) (*LoginOutput, error) {
-	return service.LoginUsecase.Execute(ctx, input)
+	return service.LoginUseCase.Execute(ctx, input)
 }
 
 // Ensure the service implements the [user.Service] interface

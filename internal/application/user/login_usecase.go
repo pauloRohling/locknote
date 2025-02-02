@@ -26,7 +26,7 @@ type LoginUseCase struct {
 	LoginUsecaseParams
 }
 
-func NewLoginUsecase(params LoginUsecaseParams) *LoginUseCase {
+func NewLoginUseCase(params LoginUsecaseParams) *LoginUseCase {
 	return &LoginUseCase{params}
 }
 

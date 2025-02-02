@@ -97,7 +97,7 @@ func TestLoginUsecase(t *testing.T) {
 
 			testCase.setup(userRepository, tokenIssuer)
 
-			loginUseCase := userApplication.NewLoginUsecase(userApplication.LoginUsecaseParams{
+			loginUseCase := userApplication.NewLoginUseCase(userApplication.LoginUsecaseParams{
 				UserRepository: userRepository,
 				TokenIssuer:    tokenIssuer,
 			})

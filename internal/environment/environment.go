@@ -1,6 +1,9 @@
 package environment
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 type Config struct {
 	Server struct {
@@ -13,6 +16,16 @@ type Config struct {
 		Password string `yaml:"password" env:"DATABASE_PASSWORD"`
 		Name     string `yaml:"name" env:"DATABASE_NAME"`
 	} `yaml:"database"`
+	Security struct {
+		Auth struct {
+			Issuer     string        `yaml:"issuer" env:"SECURITY_AUTH_ISSUER"`
+			Expiration time.Duration `yaml:"expiration" env:"SECURITY_AUTH_EXPIRATION" env-default:"1h"`
+		} `yaml:"auth"`
+		Paseto struct {
+			SecretKey string `yaml:"secret-key" env:"SECURITY_PASETO_SECRET_KEY"`
+			PublicKey string `yaml:"public-key" env:"SECURITY_PASETO_PUBLIC_KEY"`
+		} `yaml:"paseto"`
+	} `yaml:"security"`
 }
 
 func (config *Config) GetDatabaseAddress() string {
@@ -42,6 +55,18 @@ func (config *Config) validateRequiredFields() error {
 
 	if config.Database.Name == "" {
 		return config.getFieldError("database.name")
+	}
+
+	if config.Security.Paseto.SecretKey == "" {
+		return config.getFieldError("security.paseto.secret-key")
+	}
+
+	if config.Security.Paseto.PublicKey == "" {
+		return config.getFieldError("security.paseto.public-key")
+	}
+
+	if config.Security.Auth.Issuer == "" {
+		return config.getFieldError("security.auth.issuer")
 	}
 
 	return nil

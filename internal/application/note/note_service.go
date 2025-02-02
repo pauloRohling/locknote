@@ -7,7 +7,7 @@ type Service interface {
 }
 
 type FacadeServiceParams struct {
-	CreateUsecase *CreateNoteUseCase
+	CreateNoteUseCase *CreateNoteUseCase
 }
 
 type FacadeService struct {
@@ -19,7 +19,7 @@ func NewService(params FacadeServiceParams) *FacadeService {
 }
 
 func (service *FacadeService) Create(ctx context.Context, input *CreateNoteInput) (*CreateNoteOutput, error) {
-	return service.CreateUsecase.Execute(ctx, input)
+	return service.CreateNoteUseCase.Execute(ctx, input)
 }
 
 // Ensure the service implements the [note.Service] interface
