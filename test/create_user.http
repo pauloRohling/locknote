@@ -1,0 +1,9 @@
+### CreateUserRequest
+POST {{baseUrl}}/api/v1/users
+Content-Type: application/json
+
+{
+  "name": "Test User",
+  "email": "{{user.email}}",
+  "password": "{{user.password}}"
+}

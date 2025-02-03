@@ -27,6 +27,15 @@ func main() {
 
 	slog.Info("Database connection established")
 
+	tokenVerifier, err := token.NewPasetoVerifier(
+		env.Security.Paseto.PublicKey,
+		env.Security.Auth.Issuer,
+	)
+
+	if err != nil {
+		panic(fmt.Errorf("unable to create token verifier: %w", err))
+	}
+
 	tokenIssuer, err := token.NewPasetoIssuer(
 		env.Security.Paseto.SecretKey,
 		env.Security.Paseto.PublicKey,
@@ -69,7 +78,7 @@ func main() {
 	})
 
 	userRestController := userPresentation.NewRestController(userService)
-	noteRestController := notePresentation.NewRestController(noteService)
+	noteRestController := notePresentation.NewRestController(noteService, tokenVerifier)
 
 	server := rest.NewWebServer(env.Server.Port)
 	server.Register(userRestController)
