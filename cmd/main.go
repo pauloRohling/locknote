@@ -67,6 +67,9 @@ func main() {
 		NoteFactory:    noteFactory,
 		NoteRepository: noteRepository,
 	})
+	getNoteUseCase := noteApplication.NewGetNoteUseCase(noteApplication.GetNoteParams{
+		NoteRepository: noteRepository,
+	})
 	loginUseCase := userApplication.NewLoginUseCase(userApplication.LoginUsecaseParams{
 		TokenIssuer:    tokenIssuer,
 		UserRepository: userRepository,
@@ -78,6 +81,7 @@ func main() {
 	})
 	noteService := noteApplication.NewService(noteApplication.FacadeServiceParams{
 		CreateNoteUseCase: createNoteUseCase,
+		GetNoteUseCase:    getNoteUseCase,
 	})
 
 	userRestController := userPresentation.NewRestController(userService)

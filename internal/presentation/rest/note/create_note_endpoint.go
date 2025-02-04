@@ -22,16 +22,16 @@ func (controller *RestController) create(c echo.Context) error {
 		return err
 	}
 
-	response, err := controller.service.Create(c.Request().Context(), &noteApplication.CreateNoteInput{
+	input := &noteApplication.CreateNoteInput{
 		Title:   body.Title,
 		Content: body.Content,
-	})
+	}
 
+	response, err := controller.service.Create(c.Request().Context(), input)
 	if err != nil {
 		return err
 	}
 
-	return c.JSON(http.StatusCreated, &CreateNoteResponse{
-		Note: response.Note,
-	})
+	output := &CreateNoteResponse{Note: response.Note}
+	return c.JSON(http.StatusCreated, output)
 }

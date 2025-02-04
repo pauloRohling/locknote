@@ -21,16 +21,16 @@ func (controller *RestController) login(c echo.Context) error {
 		return err
 	}
 
-	response, err := controller.service.Login(c.Request().Context(), &user.LoginInput{
+	input := &user.LoginInput{
 		Email:    body.Email,
 		Password: body.Password,
-	})
+	}
 
+	response, err := controller.service.Login(c.Request().Context(), input)
 	if err != nil {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, &LoginResponse{
-		AccessToken: response.AccessToken,
-	})
+	output := &LoginResponse{AccessToken: response.AccessToken}
+	return c.JSON(http.StatusOK, output)
 }

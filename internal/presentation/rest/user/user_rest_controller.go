@@ -6,6 +6,7 @@ import (
 	"github.com/pauloRohling/locknote/internal/presentation/rest"
 )
 
+// RestController defines the REST API for the [user.Service]
 type RestController struct {
 	service user.Service
 }

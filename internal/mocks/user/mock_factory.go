@@ -139,6 +139,64 @@ func (_c *MockFactory_Parse_Call) RunAndReturn(run func(user.ParseParams) (*user
 	return _c
 }
 
+// ParseWithEncryptedPassword provides a mock function with given fields: params
+func (_m *MockFactory) ParseWithEncryptedPassword(params user.ParseParams) (*user.User, error) {
+	ret := _m.Called(params)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ParseWithEncryptedPassword")
+	}
+
+	var r0 *user.User
+	var r1 error
+	if rf, ok := ret.Get(0).(func(user.ParseParams) (*user.User, error)); ok {
+		return rf(params)
+	}
+	if rf, ok := ret.Get(0).(func(user.ParseParams) *user.User); ok {
+		r0 = rf(params)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*user.User)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(user.ParseParams) error); ok {
+		r1 = rf(params)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockFactory_ParseWithEncryptedPassword_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ParseWithEncryptedPassword'
+type MockFactory_ParseWithEncryptedPassword_Call struct {
+	*mock.Call
+}
+
+// ParseWithEncryptedPassword is a helper method to define mock.On call
+//   - params user.ParseParams
+func (_e *MockFactory_Expecter) ParseWithEncryptedPassword(params interface{}) *MockFactory_ParseWithEncryptedPassword_Call {
+	return &MockFactory_ParseWithEncryptedPassword_Call{Call: _e.mock.On("ParseWithEncryptedPassword", params)}
+}
+
+func (_c *MockFactory_ParseWithEncryptedPassword_Call) Run(run func(params user.ParseParams)) *MockFactory_ParseWithEncryptedPassword_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(user.ParseParams))
+	})
+	return _c
+}
+
+func (_c *MockFactory_ParseWithEncryptedPassword_Call) Return(_a0 *user.User, _a1 error) *MockFactory_ParseWithEncryptedPassword_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockFactory_ParseWithEncryptedPassword_Call) RunAndReturn(run func(user.ParseParams) (*user.User, error)) *MockFactory_ParseWithEncryptedPassword_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // NewMockFactory creates a new instance of MockFactory. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewMockFactory(t interface {

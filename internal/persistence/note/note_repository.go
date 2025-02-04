@@ -2,7 +2,9 @@ package note
 
 import (
 	"context"
+	"github.com/pauloRohling/locknote/internal/domain/audit"
 	"github.com/pauloRohling/locknote/internal/domain/note"
+	"github.com/pauloRohling/locknote/internal/domain/types/id"
 	"github.com/pauloRohling/locknote/internal/persistence/store"
 	"github.com/pauloRohling/locknote/pkg/transaction"
 	"github.com/pauloRohling/throw"
@@ -42,6 +44,25 @@ func (repository *Repository) Save(ctx context.Context, note *note.Note) (*note.
 	}
 
 	return repository.mapper.Parse(&newNote)
+}
+
+func (repository *Repository) FindByID(ctx context.Context, id id.ID) (*note.Note, error) {
+	userId, err := audit.GetUserId(ctx)
+	if err != nil {
+		return nil, throw.Internal().Err(err).Msg("could not get user id from context")
+	}
+
+	params := store.FindNoteByIDParams{
+		ID:        id.UUID(),
+		CreatedBy: userId.UUID(),
+	}
+
+	matchedNote, err := repository.query(ctx).FindNoteByID(ctx, params)
+	if err != nil {
+		return nil, throw.NotFound().Err(err).Msg("could not find note")
+	}
+
+	return repository.mapper.Parse(&matchedNote)
 }
 
 // Ensure the repository implements the [note.Repository] interface

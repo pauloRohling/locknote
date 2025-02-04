@@ -12,10 +12,34 @@ import (
 	"github.com/google/uuid"
 )
 
+const findNoteByID = `-- name: FindNoteByID :one
+SELECT id, title, content, created_at, created_by
+FROM notes
+WHERE id = $1
+  AND created_by = $2
+`
+
+type FindNoteByIDParams struct {
+	ID        uuid.UUID `json:"id"`
+	CreatedBy uuid.UUID `json:"createdBy"`
+}
+
+func (q *Queries) FindNoteByID(ctx context.Context, arg FindNoteByIDParams) (Note, error) {
+	row := q.db.QueryRow(ctx, findNoteByID, arg.ID, arg.CreatedBy)
+	var i Note
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Content,
+		&i.CreatedAt,
+		&i.CreatedBy,
+	)
+	return i, err
+}
+
 const insertNote = `-- name: InsertNote :one
 INSERT INTO notes (id, title, content, created_at, created_by)
-VALUES ($1, $2, $3, $4, $5)
-RETURNING id, title, content, created_at, created_by
+VALUES ($1, $2, $3, $4, $5) RETURNING id, title, content, created_at, created_by
 `
 
 type InsertNoteParams struct {
