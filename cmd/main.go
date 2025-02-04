@@ -14,6 +14,7 @@ import (
 	userPersistence "github.com/pauloRohling/locknote/internal/persistence/user"
 	"github.com/pauloRohling/locknote/internal/presentation/rest"
 	notePresentation "github.com/pauloRohling/locknote/internal/presentation/rest/note"
+	tokenPresentation "github.com/pauloRohling/locknote/internal/presentation/rest/token"
 	userPresentation "github.com/pauloRohling/locknote/internal/presentation/rest/user"
 	"log/slog"
 )
@@ -47,6 +48,8 @@ func main() {
 		panic(fmt.Errorf("unable to create token issuer: %w", err))
 	}
 
+	tokenVerifierMiddleware := tokenPresentation.VerifierMiddleware(tokenVerifier)
+
 	userFactory := userDomain.NewFactory()
 	noteFactory := noteDomain.NewFactory()
 
@@ -78,7 +81,7 @@ func main() {
 	})
 
 	userRestController := userPresentation.NewRestController(userService)
-	noteRestController := notePresentation.NewRestController(noteService, tokenVerifier)
+	noteRestController := notePresentation.NewRestController(noteService, tokenVerifierMiddleware)
 
 	server := rest.NewWebServer(env.Server.Port)
 	server.Register(userRestController)

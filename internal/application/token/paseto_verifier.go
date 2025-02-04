@@ -5,7 +5,6 @@ import (
 	"github.com/pauloRohling/locknote/internal/domain/token"
 	"github.com/pauloRohling/locknote/internal/domain/types/id"
 	"github.com/pauloRohling/throw"
-	"time"
 )
 
 // PasetoVerifier implements the [token.Verifier] interface using Paseto
@@ -23,7 +22,6 @@ func NewPasetoVerifier(publicKey, issuer string) (*PasetoVerifier, error) {
 	parser := paseto.NewParser()
 	parser.AddRule(paseto.IssuedBy(issuer))
 	parser.AddRule(paseto.NotExpired())
-	parser.AddRule(paseto.ValidAt(time.Now().UTC()))
 	parser.AddRule(paseto.NotBeforeNbf())
 
 	return &PasetoVerifier{
@@ -50,3 +48,6 @@ func (verifier *PasetoVerifier) Verify(pasetoToken string) (*token.Payload, erro
 
 	return &token.Payload{UserID: subject}, nil
 }
+
+// Ensure the verifier implements the [token.Verifier] interface
+var _ token.Verifier = (*PasetoVerifier)(nil)
