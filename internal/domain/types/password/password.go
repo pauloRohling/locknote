@@ -29,11 +29,11 @@ func (password Password) Equals(text string) bool {
 func New(password string) (Password, error) {
 	length := len(password)
 	if length < 8 {
-		return "", throw.Validation().Msg("should have at least 8 characters")
+		return "", throw.Validation().Msg("password should have at least 8 characters")
 	}
 
 	if length > 70 {
-		return "", throw.Validation().Msg("should not exceed 70 characters")
+		return "", throw.Validation().Msg("password should not be longer than 70 characters")
 	}
 
 	encryptedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)

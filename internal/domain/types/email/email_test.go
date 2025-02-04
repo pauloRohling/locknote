@@ -43,8 +43,8 @@ func TestNewEmail(t *testing.T) {
 			expectErr: true,
 			errType:   throw.ValidationErrorType,
 		},
-		"should not create an email with more than 254 characters": {
-			email:     strings.Repeat("a", 255),
+		"should not create an email with more than 255 characters": {
+			email:     strings.Repeat("a", 256),
 			expected:  "",
 			expectErr: true,
 			errType:   throw.ValidationErrorType,

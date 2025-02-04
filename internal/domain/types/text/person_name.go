@@ -24,11 +24,11 @@ func NewPersonName(name string) (PersonName, error) {
 	name = strings.TrimSpace(name)
 	length := len(name)
 	if length == 0 {
-		return "", throw.Validation().Msg("should not be empty")
+		return "", throw.Validation().Msg("name should not be empty")
 	}
 
 	if length > 50 {
-		return "", throw.Validation().Msg("should not exceed 50 characters")
+		return "", throw.Validation().Msg("name should not be longer than 50 characters")
 	}
 
 	return PersonName(name), nil

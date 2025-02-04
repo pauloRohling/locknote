@@ -24,8 +24,12 @@ func (email Email) MarshalJSON() ([]byte, error) {
 func NewEmail(email string) (Email, error) {
 	email = strings.TrimSpace(email)
 	length := len(email)
-	if length == 0 || length > 254 {
-		return "", throw.Validation().Msg("invalid email length")
+	if length == 0 {
+		return "", throw.Validation().Msg("email should	not be empty")
+	}
+
+	if length > 255 {
+		return "", throw.Validation().Msg("email should not be longer than 255 characters")
 	}
 
 	_, err := mail.ParseAddress(email)
