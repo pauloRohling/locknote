@@ -31,6 +31,12 @@ type Config struct {
 			Issuer     string        `yaml:"issuer" env:"SECURITY_AUTH_ISSUER"`
 			Expiration time.Duration `yaml:"expiration" env:"SECURITY_AUTH_EXPIRATION" env-default:"1h"`
 		} `yaml:"auth"`
+		Cors struct {
+			AllowedOrigins   []string `yaml:"allowed-origins" env:"CORS_ALLOWED_ORIGINS" env-default:"*"`
+			AllowedMethods   []string `yaml:"allowed-methods" env:"CORS_ALLOWED_METHODS" env-default:"GET,POST,PUT,PATCH,DELETE,OPTIONS"`
+			AllowedHeaders   []string `yaml:"allowed-headers" env:"CORS_ALLOWED_HEADERS" env-default:"*"`
+			AllowCredentials *bool    `yaml:"allow-credentials" env:"CORS_ALLOW_CREDENTIALS" env-default:"true"`
+		} `yaml:"cors"`
 		Paseto struct {
 			SecretKey string `yaml:"secret-key" env:"SECURITY_PASETO_SECRET_KEY"`
 			PublicKey string `yaml:"public-key" env:"SECURITY_PASETO_PUBLIC_KEY"`
@@ -52,6 +58,29 @@ func (config *Config) GetDatabaseUrl() string {
 		config.Database.Host, config.Database.Port,
 		config.Database.Name,
 	)
+}
+
+func (config *Config) validateDefaultValues() {
+	if config.Security.Cors.AllowCredentials == nil {
+		config.Security.Cors.AllowCredentials = new(bool)
+		*config.Security.Cors.AllowCredentials = true
+	}
+
+	if config.Log.Groups.Application == "" {
+		config.Log.Groups.Application = config.Log.Level
+	}
+
+	if config.Log.Groups.Persistence == "" {
+		config.Log.Groups.Persistence = config.Log.Level
+	}
+
+	if config.Log.Groups.Presentation == "" {
+		config.Log.Groups.Presentation = config.Log.Level
+	}
+
+	if config.Log.Groups.Security == "" {
+		config.Log.Groups.Security = config.Log.Level
+	}
 }
 
 func (config *Config) validateRequiredFields() error {

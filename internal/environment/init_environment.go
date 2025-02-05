@@ -36,6 +36,7 @@ func init() {
 
 	_ = cleanenv.ReadConfig(fileName, &env)
 	_ = cleanenv.ReadConfig(".env", &env)
+	env.validateDefaultValues()
 
 	zap.ReplaceGlobals(createLogger("default", env.Log.Level.ZapLevel()))
 	if err := env.validateRequiredFields(); err != nil {

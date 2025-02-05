@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/pauloRohling/locknote/internal/environment"
 )
 
 type RegistrableRoute interface {
@@ -18,8 +19,17 @@ type WebServer struct {
 }
 
 func NewWebServer(port int) *WebServer {
+	env := environment.Env()
+
 	server := echo.New()
 	server.Use(middleware.Recover())
+	server.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins:     env.Security.Cors.AllowedOrigins,
+		AllowMethods:     env.Security.Cors.AllowedMethods,
+		AllowHeaders:     env.Security.Cors.AllowedHeaders,
+		AllowCredentials: *env.Security.Cors.AllowCredentials,
+	}))
+
 	server.HideBanner = true
 
 	return &WebServer{
