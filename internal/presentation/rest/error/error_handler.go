@@ -2,6 +2,7 @@ package error
 
 import (
 	"errors"
+	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/pauloRohling/locknote/pkg/array"
 	"github.com/pauloRohling/throw"
@@ -20,9 +21,17 @@ func NewErrorHandler(log *zap.Logger) echo.HTTPErrorHandler {
 			customError = throw.Internal().Err(err).Msgf("Unexpected error")
 		}
 
-		log.Error(err.Error(), array.Map(customError.Attributes(), func(attr throw.Attribute) zap.Field {
-			return zap.String(attr.Key(), attr.Value())
-		})...)
+		errorMessage := customError.Error()
+		if innerError := customError.Unwrap(); innerError != nil {
+			errorMessage = fmt.Sprintf("%s: %s", customError, innerError)
+		}
+
+		log.Error(
+			errorMessage,
+			array.Map(customError.Attributes(), func(attr throw.Attribute) zap.Field {
+				return zap.String(attr.Key(), attr.Value())
+			})...,
+		)
 
 		statusCode := throw.ErrorType(customError.Type()).StatusCode()
 		_ = c.JSON(statusCode, HTTPError{
