@@ -117,6 +117,7 @@ func main() {
 	defer stopShutdown()
 
 	go func() {
+		presentationLogger.Info("Web server started successfully", zap.Int("port", env.Server.Port))
 		if err := server.Start(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			presentationLogger.Fatal("unable to start web server", zap.Error(err))
 		}

@@ -30,6 +30,7 @@ func NewWebServer(port int) *WebServer {
 		AllowCredentials: *env.Security.Cors.AllowCredentials,
 	}))
 
+	server.HidePort = true
 	server.HideBanner = true
 
 	return &WebServer{
