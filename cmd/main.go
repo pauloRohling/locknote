@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	noteApplication "github.com/pauloRohling/locknote/internal/application/note"
 	"github.com/pauloRohling/locknote/internal/application/token"
 	userApplication "github.com/pauloRohling/locknote/internal/application/user"
@@ -17,6 +18,9 @@ import (
 	tokenPresentation "github.com/pauloRohling/locknote/internal/presentation/rest/token"
 	userPresentation "github.com/pauloRohling/locknote/internal/presentation/rest/user"
 	"go.uber.org/zap"
+	"net/http"
+	"os/signal"
+	"syscall"
 )
 
 func main() {
@@ -104,7 +108,28 @@ func main() {
 	server.Register(userRestController)
 	server.Register(noteRestController)
 
-	if err := server.Start(); err != nil {
-		presentationLogger.Fatal("unable to start web server", zap.Error(err))
+	shutdownContext, stopShutdown := signal.NotifyContext(
+		context.Background(),
+		syscall.SIGHUP, syscall.SIGINT,
+		syscall.SIGTERM,
+		syscall.SIGQUIT,
+	)
+	defer stopShutdown()
+
+	go func() {
+		if err := server.Start(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			presentationLogger.Fatal("unable to start web server", zap.Error(err))
+		}
+	}()
+	<-shutdownContext.Done()
+
+	presentationLogger.Info("Graceful shutdown started. Waiting for active requests to complete")
+	gracefulShutdownCtx, cancel := context.WithTimeout(context.Background(), env.Server.GracefulShutdownTimeout)
+	defer cancel()
+
+	if err := server.Shutdown(gracefulShutdownCtx); err != nil {
+		presentationLogger.Fatal("Graceful shutdown timed out. Forcing exit.", zap.Error(err))
 	}
+
+	presentationLogger.Info("Graceful shutdown complete")
 }

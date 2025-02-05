@@ -7,7 +7,8 @@ import (
 
 type Config struct {
 	Server struct {
-		Port int `yaml:"port" env:"SERVER_PORT" env-default:"8080"`
+		Port                    int           `yaml:"port" env:"SERVER_PORT" env-default:"8080"`
+		GracefulShutdownTimeout time.Duration `yaml:"graceful-shutdown-timeout" env:"SERVER_GRACEFUL_SHUTDOWN_TIMEOUT" env-default:"10s"`
 	} `yaml:"server"`
 	Log struct {
 		Level  LogLevel `yaml:"level" env:"LOG_LEVEL" env-default:"INFO"`

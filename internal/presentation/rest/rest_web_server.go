@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"context"
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -31,6 +32,10 @@ func NewWebServer(port int) *WebServer {
 func (server *WebServer) Start() error {
 	address := fmt.Sprintf(":%d", server.port)
 	return server.server.Start(address)
+}
+
+func (server *WebServer) Shutdown(ctx context.Context) error {
+	return server.server.Shutdown(ctx)
 }
 
 func (server *WebServer) Register(Registrable RegistrableRoute) {
