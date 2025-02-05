@@ -9,6 +9,15 @@ type Config struct {
 	Server struct {
 		Port int `yaml:"port" env:"SERVER_PORT" env-default:"8080"`
 	} `yaml:"server"`
+	Log struct {
+		Level  LogLevel `yaml:"level" env:"LOG_LEVEL" env-default:"INFO"`
+		Groups struct {
+			Application  LogLevel `yaml:"application" env:"LOG_GROUP_APPLICATION"`
+			Persistence  LogLevel `yaml:"persistence" env:"LOG_GROUP_PERSISTENCE"`
+			Presentation LogLevel `yaml:"presentation" env:"LOG_GROUP_PRESENTATION"`
+			Security     LogLevel `yaml:"security" env:"LOG_GROUP_SECURITY"`
+		} `yaml:"groups"`
+	} `yaml:"log"`
 	Database struct {
 		Host     string `yaml:"host" env:"DATABASE_HOST" env-default:"localhost"`
 		Port     int    `yaml:"port" env:"DATABASE_PORT" env-default:"5432"`

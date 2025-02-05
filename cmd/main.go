@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	noteApplication "github.com/pauloRohling/locknote/internal/application/note"
 	"github.com/pauloRohling/locknote/internal/application/token"
 	userApplication "github.com/pauloRohling/locknote/internal/application/user"
@@ -13,20 +12,33 @@ import (
 	"github.com/pauloRohling/locknote/internal/persistence/postgres"
 	userPersistence "github.com/pauloRohling/locknote/internal/persistence/user"
 	"github.com/pauloRohling/locknote/internal/presentation/rest"
+	restError "github.com/pauloRohling/locknote/internal/presentation/rest/error"
 	notePresentation "github.com/pauloRohling/locknote/internal/presentation/rest/note"
 	tokenPresentation "github.com/pauloRohling/locknote/internal/presentation/rest/token"
 	userPresentation "github.com/pauloRohling/locknote/internal/presentation/rest/user"
-	"log/slog"
+	"go.uber.org/zap"
 )
 
 func main() {
 	env := environment.Env()
 
-	dbPoolBuilder := postgres.NewPoolBuilder(env.GetDatabaseAddress(), env.GetDatabaseUrl())
+	applicationLogger := environment.GetApplicationLogger()
+	persistenceLogger := environment.GetPersistenceLogger()
+	presentationLogger := environment.GetPresentationLogger()
+	securityLogger := environment.GetSecurityLogger()
+	defer func(applicationLogger *zap.Logger) { _ = applicationLogger.Sync() }(applicationLogger)
+	defer func(persistenceLogger *zap.Logger) { _ = persistenceLogger.Sync() }(persistenceLogger)
+	defer func(presentationLogger *zap.Logger) { _ = presentationLogger.Sync() }(presentationLogger)
+	defer func(securityLogger *zap.Logger) { _ = securityLogger.Sync() }(securityLogger)
+
+	dbPoolBuilder := postgres.NewPoolBuilder(env.GetDatabaseAddress(), env.GetDatabaseUrl(), persistenceLogger)
 	dbPool := dbPoolBuilder.Build(context.Background())
 	defer dbPool.Close()
 
-	slog.Info("Database connection established")
+	persistenceLogger.Info(
+		"Database connection established",
+		zap.String("address", env.GetDatabaseAddress()),
+	)
 
 	tokenVerifier, err := token.NewPasetoVerifier(
 		env.Security.Paseto.PublicKey,
@@ -34,7 +46,7 @@ func main() {
 	)
 
 	if err != nil {
-		panic(fmt.Errorf("unable to create token verifier: %w", err))
+		securityLogger.Fatal("unable to create token verifier", zap.Error(err))
 	}
 
 	tokenIssuer, err := token.NewPasetoIssuer(
@@ -45,7 +57,7 @@ func main() {
 	)
 
 	if err != nil {
-		panic(fmt.Errorf("unable to create token issuer: %w", err))
+		securityLogger.Fatal("unable to create token issuer", zap.Error(err))
 	}
 
 	tokenVerifierMiddleware := tokenPresentation.VerifierMiddleware(tokenVerifier)
@@ -88,10 +100,11 @@ func main() {
 	noteRestController := notePresentation.NewRestController(noteService, tokenVerifierMiddleware)
 
 	server := rest.NewWebServer(env.Server.Port)
+	server.SetErrorHandler(restError.NewErrorHandler(presentationLogger))
 	server.Register(userRestController)
 	server.Register(noteRestController)
 
 	if err := server.Start(); err != nil {
-		panic(fmt.Errorf("unable to start web server: %w", err))
+		presentationLogger.Fatal("unable to start web server", zap.Error(err))
 	}
 }

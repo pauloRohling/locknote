@@ -3,6 +3,7 @@ package environment
 import (
 	"fmt"
 	"github.com/ilyakaznacheev/cleanenv"
+	"go.uber.org/zap"
 	"os"
 )
 
@@ -36,8 +37,9 @@ func init() {
 	_ = cleanenv.ReadConfig(fileName, &env)
 	_ = cleanenv.ReadConfig(".env", &env)
 
+	zap.ReplaceGlobals(createLogger("default", env.Log.Level.ZapLevel()))
 	if err := env.validateRequiredFields(); err != nil {
-		panic("Unable to read env.yml")
+		zap.L().Fatal("Unable to read env.yml", zap.Error(err))
 	}
 }
 
