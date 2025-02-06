@@ -2,6 +2,8 @@ package user
 
 import (
 	"context"
+	"errors"
+	"github.com/jackc/pgx/v5"
 	"github.com/pauloRohling/locknote/internal/domain/types/email"
 	"github.com/pauloRohling/locknote/internal/domain/user"
 	"github.com/pauloRohling/locknote/internal/persistence/store"
@@ -48,11 +50,21 @@ func (repository *Repository) Save(ctx context.Context, user *user.User) (*user.
 
 func (repository *Repository) FindByEmail(ctx context.Context, email email.Email) (*user.User, error) {
 	matchedUser, err := repository.query(ctx).FindUserByEmail(ctx, email.String())
-	if err != nil {
-		return nil, throw.Internal().Err(err).Msg("could not find user")
+	if err == nil {
+		return repository.mapper.Parse(&matchedUser)
 	}
 
-	return repository.mapper.Parse(&matchedUser)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return nil, throw.NotFound().
+			Err(err).
+			Str("email", email.String()).
+			Msg("The provided email does not match any user")
+	}
+
+	return nil, throw.Internal().
+		Err(err).
+		Str("email", email.String()).
+		Msg("A database error occurred while trying to find a user with the provided email")
 }
 
 // Ensure the repository implements the [user.Repository] interface

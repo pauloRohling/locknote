@@ -23,6 +23,7 @@ func NewWebServer(port int) *WebServer {
 
 	server := echo.New()
 	server.Use(middleware.Recover())
+	server.Use(middleware.RequestID())
 	server.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins:     env.Security.Cors.AllowedOrigins,
 		AllowMethods:     env.Security.Cors.AllowedMethods,

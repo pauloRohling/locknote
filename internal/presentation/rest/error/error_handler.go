@@ -16,29 +16,38 @@ func NewErrorHandler(log *zap.Logger) echo.HTTPErrorHandler {
 			return
 		}
 
+		c.Response().Header().Set("Content-Type", "application/problem+json")
+
 		var customError *throw.Error
 		if !errors.As(err, &customError) {
 			customError = throw.Internal().Err(err).Msgf("Unexpected error")
 		}
 
-		errorMessage := customError.Error()
-		if innerError := customError.Unwrap(); innerError != nil {
-			errorMessage = fmt.Sprintf("%s: %s", customError, innerError)
-		}
-
-		log.Error(
-			errorMessage,
-			array.Map(customError.Attributes(), func(attr throw.Attribute) zap.Field {
-				return zap.String(attr.Key(), attr.Value())
-			})...,
-		)
-
+		requestID := c.Response().Header().Get(echo.HeaderXRequestID)
 		statusCode := throw.ErrorType(customError.Type()).StatusCode()
+		statusText := http.StatusText(statusCode)
+
+		logError(customError, log.With(zap.String("requestId", requestID)))
+
 		_ = c.JSON(statusCode, HTTPError{
-			Err:    customError.Unwrap(),
-			Title:  http.StatusText(statusCode),
-			Detail: customError.Error(),
-			Status: statusCode,
+			Title:     statusText,
+			Status:    statusCode,
+			Detail:    customError.Error(),
+			Instance:  c.Request().URL.Path,
+			RequestID: requestID,
 		})
 	}
+}
+
+func logError(customError *throw.Error, log *zap.Logger) {
+	errorMessage := customError.Error()
+	if innerError := customError.Unwrap(); innerError != nil {
+		errorMessage = fmt.Sprintf("%s: %s", customError, innerError)
+	}
+
+	fields := array.Map(customError.Attributes(), func(attr throw.Attribute) zap.Field {
+		return zap.String(attr.Key(), attr.Value())
+	})
+
+	log.Error(errorMessage, fields...)
 }

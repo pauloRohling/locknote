@@ -15,7 +15,7 @@ const (
 func GetUserId(ctx context.Context) (id.ID, error) {
 	userId, ok := ctx.Value(UserIdContextKey).(id.ID)
 	if !ok {
-		return id.Nil, throw.Validation().Msg("user id is not available in the context")
+		return id.Nil, throw.Validation().Msg("UserID is not available in the context")
 	}
 	return userId, nil
 }
