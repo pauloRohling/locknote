@@ -2,14 +2,12 @@ package note
 
 import (
 	"context"
-	"errors"
-	"github.com/jackc/pgx/v5"
 	"github.com/pauloRohling/locknote/internal/domain/audit"
 	"github.com/pauloRohling/locknote/internal/domain/note"
 	"github.com/pauloRohling/locknote/internal/domain/types/id"
+	"github.com/pauloRohling/locknote/internal/persistence/postgres"
 	"github.com/pauloRohling/locknote/internal/persistence/store"
 	"github.com/pauloRohling/locknote/pkg/transaction"
-	"github.com/pauloRohling/throw"
 )
 
 // Repository is the PostgreSQL implementation of [note.Repository]
@@ -42,7 +40,7 @@ func (repository *Repository) Save(ctx context.Context, note *note.Note) (*note.
 	})
 
 	if err != nil {
-		return nil, throw.Internal().Err(err).Msg("could not save note")
+		return nil, postgres.Throw(err)
 	}
 
 	return repository.mapper.Parse(&newNote)
@@ -51,7 +49,7 @@ func (repository *Repository) Save(ctx context.Context, note *note.Note) (*note.
 func (repository *Repository) FindByID(ctx context.Context, id id.ID) (*note.Note, error) {
 	userId, err := audit.GetUserId(ctx)
 	if err != nil {
-		return nil, throw.Internal().Err(err).Msg("Could not find an UserID in the request")
+		return nil, err
 	}
 
 	params := store.FindNoteByIDParams{
@@ -60,21 +58,10 @@ func (repository *Repository) FindByID(ctx context.Context, id id.ID) (*note.Not
 	}
 
 	matchedNote, err := repository.query(ctx).FindNoteByID(ctx, params)
-	if err == nil {
-		return repository.mapper.Parse(&matchedNote)
+	if err != nil {
+		return nil, postgres.ThrowNotFound(err)
 	}
-
-	if errors.Is(err, pgx.ErrNoRows) {
-		return nil, throw.NotFound().
-			Err(err).
-			Str("id", id.String()).
-			Msg("The provided ID does not match any note")
-	}
-
-	return nil, throw.Internal().
-		Err(err).
-		Str("id", id.String()).
-		Msg("A database error occurred while trying to find a note with the provided ID")
+	return repository.mapper.Parse(&matchedNote)
 }
 
 // Ensure the repository implements the [note.Repository] interface

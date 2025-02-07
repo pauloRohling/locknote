@@ -23,17 +23,22 @@ func NewErrorHandler(log *zap.Logger) echo.HTTPErrorHandler {
 			customError = throw.Internal().Err(err).Msgf("Unexpected error")
 		}
 
+		instance := c.Request().URL.Path
 		requestID := c.Response().Header().Get(echo.HeaderXRequestID)
 		statusCode := throw.ErrorType(customError.Type()).StatusCode()
 		statusText := http.StatusText(statusCode)
 
-		logError(customError, log.With(zap.String("requestId", requestID)))
+		logError(customError, log.With(
+			zap.String("requestId", requestID),
+			zap.String("instance", instance),
+			zap.String("method", c.Request().Method),
+		))
 
 		_ = c.JSON(statusCode, HTTPError{
 			Title:     statusText,
 			Status:    statusCode,
 			Detail:    customError.Error(),
-			Instance:  c.Request().URL.Path,
+			Instance:  instance,
 			RequestID: requestID,
 		})
 	}
@@ -41,7 +46,7 @@ func NewErrorHandler(log *zap.Logger) echo.HTTPErrorHandler {
 
 func logError(customError *throw.Error, log *zap.Logger) {
 	errorMessage := customError.Error()
-	if innerError := customError.Unwrap(); innerError != nil {
+	if innerError := customError.UnwrapOriginal(); innerError != nil {
 		errorMessage = fmt.Sprintf("%s: %s", customError, innerError)
 	}
 

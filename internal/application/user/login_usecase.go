@@ -8,6 +8,10 @@ import (
 	"github.com/pauloRohling/throw"
 )
 
+const (
+	defaultLoginErrMessage = "Invalid credentials. Please check your email and password"
+)
+
 type LoginInput struct {
 	Email    string
 	Password string
@@ -33,23 +37,23 @@ func NewLoginUseCase(params LoginUsecaseParams) *LoginUseCase {
 func (usecase *LoginUseCase) Execute(ctx context.Context, input *LoginInput) (*LoginOutput, error) {
 	userEmail, err := email.NewEmail(input.Email)
 	if err != nil {
-		return nil, err
+		return nil, throw.Unauthorized().Err(err).Msg(defaultLoginErrMessage)
 	}
 
 	matchedUser, err := usecase.UserRepository.FindByEmail(ctx, userEmail)
 	if err != nil {
-		return nil, err
+		return nil, throw.Unauthorized().Err(err).Msg(defaultLoginErrMessage)
 	}
 
 	if !matchedUser.Password().Equals(input.Password) {
-		return nil, throw.Unauthorized().Msg("invalid credentials")
+		return nil, throw.Unauthorized().Err(err).Msg(defaultLoginErrMessage)
 	}
 
 	tokenPayload := token.NewPayload(matchedUser.ID())
 
 	issuedToken, _, err := usecase.TokenIssuer.Issue(tokenPayload)
 	if err != nil {
-		return nil, err
+		return nil, throw.Unauthorized().Err(err).Msg(defaultLoginErrMessage)
 	}
 
 	return &LoginOutput{AccessToken: issuedToken}, nil

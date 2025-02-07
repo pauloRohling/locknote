@@ -4,6 +4,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/pauloRohling/locknote/internal/domain/audit"
 	"github.com/pauloRohling/locknote/internal/domain/token"
+	"github.com/pauloRohling/throw"
 	"strings"
 )
 
@@ -15,7 +16,7 @@ func VerifierMiddleware(tokenVerifier token.Verifier) echo.MiddlewareFunc {
 
 			tokenPayload, err := tokenVerifier.Verify(tokenHeader)
 			if err != nil {
-				return err
+				return throw.Unauthorized().Err(err).Msg("Missing or invalid authentication token")
 			}
 
 			ctx := audit.SetUserId(c.Request().Context(), tokenPayload.UserID)

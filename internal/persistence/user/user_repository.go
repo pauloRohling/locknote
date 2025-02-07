@@ -2,13 +2,11 @@ package user
 
 import (
 	"context"
-	"errors"
-	"github.com/jackc/pgx/v5"
 	"github.com/pauloRohling/locknote/internal/domain/types/email"
 	"github.com/pauloRohling/locknote/internal/domain/user"
+	"github.com/pauloRohling/locknote/internal/persistence/postgres"
 	"github.com/pauloRohling/locknote/internal/persistence/store"
 	"github.com/pauloRohling/locknote/pkg/transaction"
-	"github.com/pauloRohling/throw"
 )
 
 // Repository is the PostgreSQL implementation of [user.Repository]
@@ -42,7 +40,7 @@ func (repository *Repository) Save(ctx context.Context, user *user.User) (*user.
 	})
 
 	if err != nil {
-		return nil, throw.Internal().Err(err).Msg("could not save user")
+		return nil, postgres.Throw(err)
 	}
 
 	return repository.mapper.Parse(&newUser)
@@ -50,21 +48,10 @@ func (repository *Repository) Save(ctx context.Context, user *user.User) (*user.
 
 func (repository *Repository) FindByEmail(ctx context.Context, email email.Email) (*user.User, error) {
 	matchedUser, err := repository.query(ctx).FindUserByEmail(ctx, email.String())
-	if err == nil {
-		return repository.mapper.Parse(&matchedUser)
+	if err != nil {
+		return nil, postgres.ThrowNotFound(err)
 	}
-
-	if errors.Is(err, pgx.ErrNoRows) {
-		return nil, throw.NotFound().
-			Err(err).
-			Str("email", email.String()).
-			Msg("The provided email does not match any user")
-	}
-
-	return nil, throw.Internal().
-		Err(err).
-		Str("email", email.String()).
-		Msg("A database error occurred while trying to find a user with the provided email")
+	return repository.mapper.Parse(&matchedUser)
 }
 
 // Ensure the repository implements the [user.Repository] interface

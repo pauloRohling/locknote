@@ -8,7 +8,7 @@ require (
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/jackc/pgx/v5 v5.7.2
 	github.com/labstack/echo/v4 v4.13.3
-	github.com/pauloRohling/throw v0.1.6
+	github.com/pauloRohling/throw v0.1.7
 	github.com/stretchr/testify v1.10.0
 	golang.org/x/crypto v0.32.0
 )
