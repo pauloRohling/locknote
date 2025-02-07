@@ -22,11 +22,11 @@ func (controller *RestController) getById(c echo.Context) error {
 		NoteID: noteId,
 	}
 
-	response, err := controller.service.GetById(c.Request().Context(), input)
+	output, err := controller.service.GetById(c.Request().Context(), input)
 	if err != nil {
 		return err
 	}
 
-	output := &GetNoteResponse{Note: response.Note}
-	return c.JSON(http.StatusOK, output)
+	response := &GetNoteResponse{Note: output.Note}
+	return c.JSON(http.StatusOK, response)
 }

@@ -29,11 +29,11 @@ func (controller *RestController) create(c echo.Context) error {
 		Password: body.Password,
 	}
 
-	response, err := controller.service.Create(c.Request().Context(), input)
+	output, err := controller.service.Create(c.Request().Context(), input)
 	if err != nil {
 		return err
 	}
 
-	output := &CreateUserResponse{User: response.User}
-	return c.JSON(http.StatusCreated, output)
+	response := &CreateUserResponse{User: output.User}
+	return c.JSON(http.StatusCreated, response)
 }

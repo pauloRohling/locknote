@@ -18,7 +18,7 @@ FROM users
 WHERE email = $1
 `
 
-func (q *Queries) FindUserByEmail(ctx context.Context, email string) (User, error) {
+func (q *Queries) FindUserByEmail(ctx context.Context, email string) (*User, error) {
 	row := q.db.QueryRow(ctx, findUserByEmail, email)
 	var i User
 	err := row.Scan(
@@ -29,7 +29,7 @@ func (q *Queries) FindUserByEmail(ctx context.Context, email string) (User, erro
 		&i.CreatedAt,
 		&i.CreatedBy,
 	)
-	return i, err
+	return &i, err
 }
 
 const insertUser = `-- name: InsertUser :one
@@ -47,7 +47,7 @@ type InsertUserParams struct {
 	CreatedBy uuid.UUID `json:"createdBy"`
 }
 
-func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) (User, error) {
+func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) (*User, error) {
 	row := q.db.QueryRow(ctx, insertUser,
 		arg.ID,
 		arg.Name,
@@ -65,5 +65,5 @@ func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) (User, e
 		&i.CreatedAt,
 		&i.CreatedBy,
 	)
-	return i, err
+	return &i, err
 }

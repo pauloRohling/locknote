@@ -24,7 +24,7 @@ type FindNoteByIDParams struct {
 	CreatedBy uuid.UUID `json:"createdBy"`
 }
 
-func (q *Queries) FindNoteByID(ctx context.Context, arg FindNoteByIDParams) (Note, error) {
+func (q *Queries) FindNoteByID(ctx context.Context, arg FindNoteByIDParams) (*Note, error) {
 	row := q.db.QueryRow(ctx, findNoteByID, arg.ID, arg.CreatedBy)
 	var i Note
 	err := row.Scan(
@@ -34,7 +34,54 @@ func (q *Queries) FindNoteByID(ctx context.Context, arg FindNoteByIDParams) (Not
 		&i.CreatedAt,
 		&i.CreatedBy,
 	)
-	return i, err
+	return &i, err
+}
+
+const findNotesByUser = `-- name: FindNotesByUser :many
+SELECT id, title, content, created_at, created_by
+FROM notes
+WHERE created_by = $1
+ORDER BY $2
+LIMIT $3
+OFFSET $4
+`
+
+type FindNotesByUserParams struct {
+	CreatedBy uuid.UUID   `json:"createdBy"`
+	Column2   interface{} `json:"column2"`
+	Limit     int32       `json:"limit"`
+	Offset    int32       `json:"offset"`
+}
+
+func (q *Queries) FindNotesByUser(ctx context.Context, arg FindNotesByUserParams) ([]*Note, error) {
+	rows, err := q.db.Query(ctx, findNotesByUser,
+		arg.CreatedBy,
+		arg.Column2,
+		arg.Limit,
+		arg.Offset,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []*Note{}
+	for rows.Next() {
+		var i Note
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Content,
+			&i.CreatedAt,
+			&i.CreatedBy,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const insertNote = `-- name: InsertNote :one
@@ -50,7 +97,7 @@ type InsertNoteParams struct {
 	CreatedBy uuid.UUID `json:"createdBy"`
 }
 
-func (q *Queries) InsertNote(ctx context.Context, arg InsertNoteParams) (Note, error) {
+func (q *Queries) InsertNote(ctx context.Context, arg InsertNoteParams) (*Note, error) {
 	row := q.db.QueryRow(ctx, insertNote,
 		arg.ID,
 		arg.Title,
@@ -66,5 +113,5 @@ func (q *Queries) InsertNote(ctx context.Context, arg InsertNoteParams) (Note, e
 		&i.CreatedAt,
 		&i.CreatedBy,
 	)
-	return i, err
+	return &i, err
 }

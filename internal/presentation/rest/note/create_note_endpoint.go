@@ -27,11 +27,11 @@ func (controller *RestController) create(c echo.Context) error {
 		Content: body.Content,
 	}
 
-	response, err := controller.service.Create(c.Request().Context(), input)
+	output, err := controller.service.Create(c.Request().Context(), input)
 	if err != nil {
 		return err
 	}
 
-	output := &CreateNoteResponse{Note: response.Note}
-	return c.JSON(http.StatusCreated, output)
+	response := &CreateNoteResponse{Note: output.Note}
+	return c.JSON(http.StatusCreated, response)
 }

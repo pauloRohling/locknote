@@ -43,7 +43,7 @@ func (repository *Repository) Save(ctx context.Context, user *user.User) (*user.
 		return nil, postgres.Throw(err)
 	}
 
-	return repository.mapper.Parse(&newUser)
+	return repository.mapper.Parse(newUser)
 }
 
 func (repository *Repository) FindByEmail(ctx context.Context, email email.Email) (*user.User, error) {
@@ -51,7 +51,7 @@ func (repository *Repository) FindByEmail(ctx context.Context, email email.Email
 	if err != nil {
 		return nil, postgres.ThrowNotFound(err)
 	}
-	return repository.mapper.Parse(&matchedUser)
+	return repository.mapper.Parse(matchedUser)
 }
 
 // Ensure the repository implements the [user.Repository] interface

@@ -30,10 +30,12 @@ func main() {
 	persistenceLogger := environment.GetPersistenceLogger()
 	presentationLogger := environment.GetPresentationLogger()
 	securityLogger := environment.GetSecurityLogger()
-	defer func(applicationLogger *zap.Logger) { _ = applicationLogger.Sync() }(applicationLogger)
-	defer func(persistenceLogger *zap.Logger) { _ = persistenceLogger.Sync() }(persistenceLogger)
-	defer func(presentationLogger *zap.Logger) { _ = presentationLogger.Sync() }(presentationLogger)
-	defer func(securityLogger *zap.Logger) { _ = securityLogger.Sync() }(securityLogger)
+	defer func() {
+		_ = applicationLogger.Sync()
+		_ = persistenceLogger.Sync()
+		_ = presentationLogger.Sync()
+		_ = securityLogger.Sync()
+	}()
 
 	dbPoolBuilder := postgres.NewPoolBuilder(env.GetDatabaseAddress(), env.GetDatabaseUrl(), persistenceLogger)
 	dbPool := dbPoolBuilder.Build(context.Background())
@@ -90,6 +92,9 @@ func main() {
 		TokenIssuer:    tokenIssuer,
 		UserRepository: userRepository,
 	})
+	listNotesUseCase := noteApplication.NewListNotesUseCase(noteApplication.ListNotesParams{
+		NoteRepository: noteRepository,
+	})
 
 	userService := userApplication.NewService(userApplication.FacadeServiceParams{
 		CreateUseCase: createUserUseCase,
@@ -98,6 +103,7 @@ func main() {
 	noteService := noteApplication.NewService(noteApplication.FacadeServiceParams{
 		CreateNoteUseCase: createNoteUseCase,
 		GetNoteUseCase:    getNoteUseCase,
+		ListNotesUseCase:  listNotesUseCase,
 	})
 
 	userRestController := userPresentation.NewRestController(userService)
@@ -110,9 +116,7 @@ func main() {
 
 	shutdownContext, stopShutdown := signal.NotifyContext(
 		context.Background(),
-		syscall.SIGHUP, syscall.SIGINT,
-		syscall.SIGTERM,
-		syscall.SIGQUIT,
+		syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT,
 	)
 	defer stopShutdown()
 

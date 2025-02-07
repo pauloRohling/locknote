@@ -23,6 +23,7 @@ func (controller *RestController) Register(api *echo.Group) {
 	notesApi := api.Group("/notes")
 	notesApi.Use(controller.tokenVerifier)
 	notesApi.POST("", controller.create)
+	notesApi.GET("", controller.list, controller.getPaginationMiddleware())
 	notesApi.GET("/:id", controller.getById)
 }
 

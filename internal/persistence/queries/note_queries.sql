@@ -7,3 +7,11 @@ SELECT *
 FROM notes
 WHERE id = $1
   AND created_by = $2;
+
+-- name: FindNotesByUser :many
+SELECT *
+FROM notes
+WHERE created_by = $1
+ORDER BY $2
+LIMIT $3
+OFFSET $4;

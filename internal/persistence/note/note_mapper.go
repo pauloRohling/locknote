@@ -10,6 +10,7 @@ import (
 // Mapper is responsible for mapping [store.Note] objects to the domain model
 type Mapper interface {
 	Parse(savedNote *store.Note) (*note.Note, error)
+	ParseMany(savedNotes []*store.Note) ([]*note.Note, error)
 }
 
 type DefaultMapper struct {
@@ -31,6 +32,20 @@ func (mapper *DefaultMapper) Parse(savedNote *store.Note) (*note.Note, error) {
 			Content: savedNote.Content,
 		},
 	})
+}
+
+func (mapper *DefaultMapper) ParseMany(savedNotes []*store.Note) ([]*note.Note, error) {
+	notes := make([]*note.Note, len(savedNotes))
+
+	for index, savedNote := range savedNotes {
+		parse, err := mapper.Parse(savedNote)
+		if err != nil {
+			return nil, err
+		}
+		notes[index] = parse
+	}
+
+	return notes, nil
 }
 
 // Ensure the mapper implements the [Mapper] interface

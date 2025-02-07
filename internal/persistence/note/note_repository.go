@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/pauloRohling/locknote/internal/domain/audit"
 	"github.com/pauloRohling/locknote/internal/domain/note"
+	"github.com/pauloRohling/locknote/internal/domain/pagination"
 	"github.com/pauloRohling/locknote/internal/domain/types/id"
 	"github.com/pauloRohling/locknote/internal/persistence/postgres"
 	"github.com/pauloRohling/locknote/internal/persistence/store"
@@ -43,7 +44,7 @@ func (repository *Repository) Save(ctx context.Context, note *note.Note) (*note.
 		return nil, postgres.Throw(err)
 	}
 
-	return repository.mapper.Parse(&newNote)
+	return repository.mapper.Parse(newNote)
 }
 
 func (repository *Repository) FindByID(ctx context.Context, id id.ID) (*note.Note, error) {
@@ -61,7 +62,29 @@ func (repository *Repository) FindByID(ctx context.Context, id id.ID) (*note.Not
 	if err != nil {
 		return nil, postgres.ThrowNotFound(err)
 	}
-	return repository.mapper.Parse(&matchedNote)
+
+	return repository.mapper.Parse(matchedNote)
+}
+
+func (repository *Repository) FindAllNotes(ctx context.Context, pagination pagination.Pagination) ([]*note.Note, error) {
+	userId, err := audit.GetUserId(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	params := store.FindNotesByUserParams{
+		CreatedBy: userId.UUID(),
+		Limit:     pagination.Limit(),
+		Offset:    pagination.Offset(),
+		Column2:   pagination.Order(),
+	}
+
+	matchedNotes, err := repository.query(ctx).FindNotesByUser(ctx, params)
+	if err != nil {
+		return nil, postgres.Throw(err)
+	}
+
+	return repository.mapper.ParseMany(matchedNotes)
 }
 
 // Ensure the repository implements the [note.Repository] interface
