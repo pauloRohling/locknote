@@ -36,7 +36,3 @@ func (controller *RestController) list(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, response)
 }
-
-func (controller *RestController) getPaginationMiddleware() echo.MiddlewareFunc {
-	return pagination.Middleware([]string{"created_at"}, "id")
-}

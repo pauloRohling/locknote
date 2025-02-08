@@ -12,6 +12,6 @@ WHERE id = $1
 SELECT *
 FROM notes
 WHERE created_by = $1
-ORDER BY $2
-LIMIT $3
-OFFSET $4;
+ORDER BY created_at DESC
+LIMIT $2
+OFFSET $3;

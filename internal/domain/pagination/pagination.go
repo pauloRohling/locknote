@@ -1,28 +1,16 @@
 package pagination
 
-import (
-	"fmt"
-	"strings"
-)
-
 const (
-	MaxPageSize     = 100
 	DefaultPageSize = 10
+	MaxPageSize     = 100
 )
 
 type Pagination struct {
-	OrderBy  string         `json:"orderBy"`
-	OrderDir OrderDirection `json:"orderDir"`
-	Page     int32          `json:"page"`
-	Size     int32          `json:"size"`
+	Page int32 `json:"page"`
+	Size int32 `json:"size"`
 }
 
-func NewPagination(page int32, size int32, orderBy string, orderDir OrderDirection) Pagination {
-	orderDir = OrderDirection(strings.ToUpper(orderDir.String()))
-	if orderDir != ASC && orderDir != DESC {
-		orderDir = ASC
-	}
-
+func NewPagination(page int32, size int32) Pagination {
 	if page < 1 {
 		page = 1
 	}
@@ -32,18 +20,9 @@ func NewPagination(page int32, size int32, orderBy string, orderDir OrderDirecti
 	}
 
 	return Pagination{
-		OrderBy:  orderBy,
-		OrderDir: orderDir,
-		Page:     page,
-		Size:     size,
+		Page: page,
+		Size: size,
 	}
-}
-
-func (pagination *Pagination) Order() string {
-	if pagination.OrderBy == "" {
-		return ""
-	}
-	return fmt.Sprintf("%s %s", pagination.OrderBy, pagination.OrderDir)
 }
 
 func (pagination *Pagination) Limit() int32 {

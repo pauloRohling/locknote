@@ -41,25 +41,19 @@ const findNotesByUser = `-- name: FindNotesByUser :many
 SELECT id, title, content, created_at, created_by
 FROM notes
 WHERE created_by = $1
-ORDER BY $2
-LIMIT $3
-OFFSET $4
+ORDER BY created_at DESC
+LIMIT $2
+OFFSET $3
 `
 
 type FindNotesByUserParams struct {
-	CreatedBy uuid.UUID   `json:"createdBy"`
-	Column2   interface{} `json:"column2"`
-	Limit     int32       `json:"limit"`
-	Offset    int32       `json:"offset"`
+	CreatedBy uuid.UUID `json:"createdBy"`
+	Limit     int32     `json:"limit"`
+	Offset    int32     `json:"offset"`
 }
 
 func (q *Queries) FindNotesByUser(ctx context.Context, arg FindNotesByUserParams) ([]*Note, error) {
-	rows, err := q.db.Query(ctx, findNotesByUser,
-		arg.CreatedBy,
-		arg.Column2,
-		arg.Limit,
-		arg.Offset,
-	)
+	rows, err := q.db.Query(ctx, findNotesByUser, arg.CreatedBy, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}

@@ -21,7 +21,7 @@ func NewDefault(userId id.ID) Audit {
 // New creates audit information with the provided values
 func New(createdAt time.Time, createdBy id.ID) Audit {
 	return Audit{
-		createdAt: createdAt,
+		createdAt: createdAt.UTC(),
 		createdBy: createdBy,
 	}
 }

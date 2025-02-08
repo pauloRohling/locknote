@@ -76,7 +76,6 @@ func (repository *Repository) FindAllNotes(ctx context.Context, pagination pagin
 		CreatedBy: userId.UUID(),
 		Limit:     pagination.Limit(),
 		Offset:    pagination.Offset(),
-		Column2:   pagination.Order(),
 	}
 
 	matchedNotes, err := repository.query(ctx).FindNotesByUser(ctx, params)
