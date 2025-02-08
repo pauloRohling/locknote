@@ -2,6 +2,7 @@ package user_test
 
 import (
 	"context"
+	"errors"
 	"github.com/google/uuid"
 	userApplication "github.com/pauloRohling/locknote/internal/application/user"
 	"github.com/pauloRohling/locknote/internal/domain/types/email"
@@ -50,10 +51,10 @@ func TestLoginUsecase(t *testing.T) {
 				Password: "test123456",
 			},
 			setup: func(userRepository *mockuser.MockRepository, tokenIssuer *mocktoken.MockIssuer) {
-				userRepository.EXPECT().FindByEmail(mock.Anything, mock.Anything).Return(nil, throw.NotFound().Msg("user not found"))
+				userRepository.EXPECT().FindByEmail(mock.Anything, mock.Anything).Return(nil, errors.New("user not found"))
 			},
 			expectErr: true,
-			errType:   throw.NotFoundErrorType,
+			errType:   throw.UnauthorizedErrorType,
 		},
 		"should return an error if the token issuer fails to issue the token": {
 			input: &userApplication.LoginInput{
@@ -62,10 +63,10 @@ func TestLoginUsecase(t *testing.T) {
 			},
 			setup: func(userRepository *mockuser.MockRepository, tokenIssuer *mocktoken.MockIssuer) {
 				userRepository.EXPECT().FindByEmail(mock.Anything, mock.Anything).Return(mockUser, nil)
-				tokenIssuer.EXPECT().Issue(mock.Anything).Return("", id.ID(uuid.New()), throw.Internal().Msg("failed to issue token"))
+				tokenIssuer.EXPECT().Issue(mock.Anything).Return("", id.ID(uuid.New()), errors.New("failed to issue token"))
 			},
 			expectErr: true,
-			errType:   throw.InternalErrorType,
+			errType:   throw.UnauthorizedErrorType,
 		},
 		"should return an error if the user email is invalid": {
 			input: &userApplication.LoginInput{
@@ -75,7 +76,7 @@ func TestLoginUsecase(t *testing.T) {
 			setup: func(userRepository *mockuser.MockRepository, tokenIssuer *mocktoken.MockIssuer) {
 			},
 			expectErr: true,
-			errType:   throw.ValidationErrorType,
+			errType:   throw.UnauthorizedErrorType,
 		},
 		"should return and error if the user password does not match": {
 			input: &userApplication.LoginInput{
