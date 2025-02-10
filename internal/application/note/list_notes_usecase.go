@@ -28,7 +28,7 @@ func NewListNotesUseCase(params ListNotesParams) *ListNotesUseCase {
 }
 
 func (usecase *ListNotesUseCase) Execute(ctx context.Context, input *ListNotesInput) (*ListNotesOutput, error) {
-	notes, err := usecase.NoteRepository.FindAllNotes(ctx, input.Pagination)
+	notes, err := usecase.NoteRepository.FindAll(ctx, input.Pagination)
 	if err != nil {
 		return nil, err
 	}

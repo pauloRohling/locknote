@@ -12,8 +12,34 @@ import (
 	"github.com/google/uuid"
 )
 
+const deleteNote = `-- name: DeleteNote :exec
+DELETE FROM notes
+WHERE id = $1
+  AND created_by = $2
+`
+
+type DeleteNoteParams struct {
+	ID        uuid.UUID `json:"id"`
+	CreatedBy uuid.UUID `json:"createdBy"`
+}
+
+func (q *Queries) DeleteNote(ctx context.Context, arg DeleteNoteParams) error {
+	_, err := q.db.Exec(ctx, deleteNote, arg.ID, arg.CreatedBy)
+	return err
+}
+
+const deleteNotesByUser = `-- name: DeleteNotesByUser :exec
+DELETE FROM notes
+WHERE created_by = $1
+`
+
+func (q *Queries) DeleteNotesByUser(ctx context.Context, createdBy uuid.UUID) error {
+	_, err := q.db.Exec(ctx, deleteNotesByUser, createdBy)
+	return err
+}
+
 const findNoteByID = `-- name: FindNoteByID :one
-SELECT id, title, content, created_at, created_by
+SELECT id, title, content, created_at, created_by, updated_at, updated_by
 FROM notes
 WHERE id = $1
   AND created_by = $2
@@ -33,12 +59,14 @@ func (q *Queries) FindNoteByID(ctx context.Context, arg FindNoteByIDParams) (*No
 		&i.Content,
 		&i.CreatedAt,
 		&i.CreatedBy,
+		&i.UpdatedAt,
+		&i.UpdatedBy,
 	)
 	return &i, err
 }
 
 const findNotesByUser = `-- name: FindNotesByUser :many
-SELECT id, title, content, created_at, created_by
+SELECT id, title, content, created_at, created_by, updated_at, updated_by
 FROM notes
 WHERE created_by = $1
 ORDER BY created_at DESC
@@ -67,6 +95,8 @@ func (q *Queries) FindNotesByUser(ctx context.Context, arg FindNotesByUserParams
 			&i.Content,
 			&i.CreatedAt,
 			&i.CreatedBy,
+			&i.UpdatedAt,
+			&i.UpdatedBy,
 		); err != nil {
 			return nil, err
 		}
@@ -79,8 +109,8 @@ func (q *Queries) FindNotesByUser(ctx context.Context, arg FindNotesByUserParams
 }
 
 const insertNote = `-- name: InsertNote :one
-INSERT INTO notes (id, title, content, created_at, created_by)
-VALUES ($1, $2, $3, $4, $5) RETURNING id, title, content, created_at, created_by
+INSERT INTO notes (id, title, content, created_at, created_by, updated_at, updated_by)
+VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, title, content, created_at, created_by, updated_at, updated_by
 `
 
 type InsertNoteParams struct {
@@ -89,6 +119,8 @@ type InsertNoteParams struct {
 	Content   string    `json:"content"`
 	CreatedAt time.Time `json:"createdAt"`
 	CreatedBy uuid.UUID `json:"createdBy"`
+	UpdatedAt time.Time `json:"updatedAt"`
+	UpdatedBy uuid.UUID `json:"updatedBy"`
 }
 
 func (q *Queries) InsertNote(ctx context.Context, arg InsertNoteParams) (*Note, error) {
@@ -98,6 +130,8 @@ func (q *Queries) InsertNote(ctx context.Context, arg InsertNoteParams) (*Note, 
 		arg.Content,
 		arg.CreatedAt,
 		arg.CreatedBy,
+		arg.UpdatedAt,
+		arg.UpdatedBy,
 	)
 	var i Note
 	err := row.Scan(
@@ -106,6 +140,47 @@ func (q *Queries) InsertNote(ctx context.Context, arg InsertNoteParams) (*Note, 
 		&i.Content,
 		&i.CreatedAt,
 		&i.CreatedBy,
+		&i.UpdatedAt,
+		&i.UpdatedBy,
+	)
+	return &i, err
+}
+
+const updateNote = `-- name: UpdateNote :one
+UPDATE notes
+SET title = $3, content = $4, updated_at = $5, updated_by = $6
+WHERE id = $1
+  AND created_by = $2
+RETURNING id, title, content, created_at, created_by, updated_at, updated_by
+`
+
+type UpdateNoteParams struct {
+	ID        uuid.UUID `json:"id"`
+	CreatedBy uuid.UUID `json:"createdBy"`
+	Title     string    `json:"title"`
+	Content   string    `json:"content"`
+	UpdatedAt time.Time `json:"updatedAt"`
+	UpdatedBy uuid.UUID `json:"updatedBy"`
+}
+
+func (q *Queries) UpdateNote(ctx context.Context, arg UpdateNoteParams) (*Note, error) {
+	row := q.db.QueryRow(ctx, updateNote,
+		arg.ID,
+		arg.CreatedBy,
+		arg.Title,
+		arg.Content,
+		arg.UpdatedAt,
+		arg.UpdatedBy,
+	)
+	var i Note
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Content,
+		&i.CreatedAt,
+		&i.CreatedBy,
+		&i.UpdatedAt,
+		&i.UpdatedBy,
 	)
 	return &i, err
 }

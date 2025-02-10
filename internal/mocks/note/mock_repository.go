@@ -26,12 +26,106 @@ func (_m *MockRepository) EXPECT() *MockRepository_Expecter {
 	return &MockRepository_Expecter{mock: &_m.Mock}
 }
 
-// FindAllNotes provides a mock function with given fields: ctx, _a1
-func (_m *MockRepository) FindAllNotes(ctx context.Context, _a1 pagination.Pagination) ([]*note.Note, error) {
+// Delete provides a mock function with given fields: ctx, noteId
+func (_m *MockRepository) Delete(ctx context.Context, noteId id.ID) error {
+	ret := _m.Called(ctx, noteId)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Delete")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, id.ID) error); ok {
+		r0 = rf(ctx, noteId)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// MockRepository_Delete_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Delete'
+type MockRepository_Delete_Call struct {
+	*mock.Call
+}
+
+// Delete is a helper method to define mock.On call
+//   - ctx context.Context
+//   - noteId id.ID
+func (_e *MockRepository_Expecter) Delete(ctx interface{}, noteId interface{}) *MockRepository_Delete_Call {
+	return &MockRepository_Delete_Call{Call: _e.mock.On("Delete", ctx, noteId)}
+}
+
+func (_c *MockRepository_Delete_Call) Run(run func(ctx context.Context, noteId id.ID)) *MockRepository_Delete_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(id.ID))
+	})
+	return _c
+}
+
+func (_c *MockRepository_Delete_Call) Return(_a0 error) *MockRepository_Delete_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockRepository_Delete_Call) RunAndReturn(run func(context.Context, id.ID) error) *MockRepository_Delete_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// DeleteAllByUser provides a mock function with given fields: ctx, userId
+func (_m *MockRepository) DeleteAllByUser(ctx context.Context, userId id.ID) error {
+	ret := _m.Called(ctx, userId)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteAllByUser")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, id.ID) error); ok {
+		r0 = rf(ctx, userId)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// MockRepository_DeleteAllByUser_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteAllByUser'
+type MockRepository_DeleteAllByUser_Call struct {
+	*mock.Call
+}
+
+// DeleteAllByUser is a helper method to define mock.On call
+//   - ctx context.Context
+//   - userId id.ID
+func (_e *MockRepository_Expecter) DeleteAllByUser(ctx interface{}, userId interface{}) *MockRepository_DeleteAllByUser_Call {
+	return &MockRepository_DeleteAllByUser_Call{Call: _e.mock.On("DeleteAllByUser", ctx, userId)}
+}
+
+func (_c *MockRepository_DeleteAllByUser_Call) Run(run func(ctx context.Context, userId id.ID)) *MockRepository_DeleteAllByUser_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(id.ID))
+	})
+	return _c
+}
+
+func (_c *MockRepository_DeleteAllByUser_Call) Return(_a0 error) *MockRepository_DeleteAllByUser_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockRepository_DeleteAllByUser_Call) RunAndReturn(run func(context.Context, id.ID) error) *MockRepository_DeleteAllByUser_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// FindAll provides a mock function with given fields: ctx, _a1
+func (_m *MockRepository) FindAll(ctx context.Context, _a1 pagination.Pagination) ([]*note.Note, error) {
 	ret := _m.Called(ctx, _a1)
 
 	if len(ret) == 0 {
-		panic("no return value specified for FindAllNotes")
+		panic("no return value specified for FindAll")
 	}
 
 	var r0 []*note.Note
@@ -56,31 +150,31 @@ func (_m *MockRepository) FindAllNotes(ctx context.Context, _a1 pagination.Pagin
 	return r0, r1
 }
 
-// MockRepository_FindAllNotes_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'FindAllNotes'
-type MockRepository_FindAllNotes_Call struct {
+// MockRepository_FindAll_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'FindAll'
+type MockRepository_FindAll_Call struct {
 	*mock.Call
 }
 
-// FindAllNotes is a helper method to define mock.On call
+// FindAll is a helper method to define mock.On call
 //   - ctx context.Context
 //   - _a1 pagination.Pagination
-func (_e *MockRepository_Expecter) FindAllNotes(ctx interface{}, _a1 interface{}) *MockRepository_FindAllNotes_Call {
-	return &MockRepository_FindAllNotes_Call{Call: _e.mock.On("FindAllNotes", ctx, _a1)}
+func (_e *MockRepository_Expecter) FindAll(ctx interface{}, _a1 interface{}) *MockRepository_FindAll_Call {
+	return &MockRepository_FindAll_Call{Call: _e.mock.On("FindAll", ctx, _a1)}
 }
 
-func (_c *MockRepository_FindAllNotes_Call) Run(run func(ctx context.Context, _a1 pagination.Pagination)) *MockRepository_FindAllNotes_Call {
+func (_c *MockRepository_FindAll_Call) Run(run func(ctx context.Context, _a1 pagination.Pagination)) *MockRepository_FindAll_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(pagination.Pagination))
 	})
 	return _c
 }
 
-func (_c *MockRepository_FindAllNotes_Call) Return(_a0 []*note.Note, _a1 error) *MockRepository_FindAllNotes_Call {
+func (_c *MockRepository_FindAll_Call) Return(_a0 []*note.Note, _a1 error) *MockRepository_FindAll_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *MockRepository_FindAllNotes_Call) RunAndReturn(run func(context.Context, pagination.Pagination) ([]*note.Note, error)) *MockRepository_FindAllNotes_Call {
+func (_c *MockRepository_FindAll_Call) RunAndReturn(run func(context.Context, pagination.Pagination) ([]*note.Note, error)) *MockRepository_FindAll_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -199,6 +293,65 @@ func (_c *MockRepository_Save_Call) Return(_a0 *note.Note, _a1 error) *MockRepos
 }
 
 func (_c *MockRepository_Save_Call) RunAndReturn(run func(context.Context, *note.Note) (*note.Note, error)) *MockRepository_Save_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Update provides a mock function with given fields: ctx, _a1
+func (_m *MockRepository) Update(ctx context.Context, _a1 *note.Note) (*note.Note, error) {
+	ret := _m.Called(ctx, _a1)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Update")
+	}
+
+	var r0 *note.Note
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *note.Note) (*note.Note, error)); ok {
+		return rf(ctx, _a1)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *note.Note) *note.Note); ok {
+		r0 = rf(ctx, _a1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*note.Note)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, *note.Note) error); ok {
+		r1 = rf(ctx, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockRepository_Update_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Update'
+type MockRepository_Update_Call struct {
+	*mock.Call
+}
+
+// Update is a helper method to define mock.On call
+//   - ctx context.Context
+//   - _a1 *note.Note
+func (_e *MockRepository_Expecter) Update(ctx interface{}, _a1 interface{}) *MockRepository_Update_Call {
+	return &MockRepository_Update_Call{Call: _e.mock.On("Update", ctx, _a1)}
+}
+
+func (_c *MockRepository_Update_Call) Run(run func(ctx context.Context, _a1 *note.Note)) *MockRepository_Update_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(*note.Note))
+	})
+	return _c
+}
+
+func (_c *MockRepository_Update_Call) Return(_a0 *note.Note, _a1 error) *MockRepository_Update_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockRepository_Update_Call) RunAndReturn(run func(context.Context, *note.Note) (*note.Note, error)) *MockRepository_Update_Call {
 	_c.Call.Return(run)
 	return _c
 }

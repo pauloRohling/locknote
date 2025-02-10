@@ -12,8 +12,18 @@ import (
 	"github.com/google/uuid"
 )
 
+const deleteUser = `-- name: DeleteUser :exec
+DELETE FROM users
+WHERE id = $1
+`
+
+func (q *Queries) DeleteUser(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.Exec(ctx, deleteUser, id)
+	return err
+}
+
 const findUserByEmail = `-- name: FindUserByEmail :one
-SELECT id, name, email, password, created_at, created_by
+SELECT id, name, email, password, created_at, created_by, updated_at, updated_by
 FROM users
 WHERE email = $1
 `
@@ -28,14 +38,38 @@ func (q *Queries) FindUserByEmail(ctx context.Context, email string) (*User, err
 		&i.Password,
 		&i.CreatedAt,
 		&i.CreatedBy,
+		&i.UpdatedAt,
+		&i.UpdatedBy,
+	)
+	return &i, err
+}
+
+const findUserByID = `-- name: FindUserByID :one
+SELECT id, name, email, password, created_at, created_by, updated_at, updated_by
+FROM users
+WHERE id = $1
+`
+
+func (q *Queries) FindUserByID(ctx context.Context, id uuid.UUID) (*User, error) {
+	row := q.db.QueryRow(ctx, findUserByID, id)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Email,
+		&i.Password,
+		&i.CreatedAt,
+		&i.CreatedBy,
+		&i.UpdatedAt,
+		&i.UpdatedBy,
 	)
 	return &i, err
 }
 
 const insertUser = `-- name: InsertUser :one
-INSERT INTO users (id, name, email, password, created_at, created_by)
-VALUES ($1, $2, $3, $4, $5, $6)
-RETURNING id, name, email, password, created_at, created_by
+INSERT INTO users (id, name, email, password, created_at, created_by, updated_at, updated_by)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+RETURNING id, name, email, password, created_at, created_by, updated_at, updated_by
 `
 
 type InsertUserParams struct {
@@ -45,6 +79,8 @@ type InsertUserParams struct {
 	Password  string    `json:"password"`
 	CreatedAt time.Time `json:"createdAt"`
 	CreatedBy uuid.UUID `json:"createdBy"`
+	UpdatedAt time.Time `json:"updatedAt"`
+	UpdatedBy uuid.UUID `json:"updatedBy"`
 }
 
 func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) (*User, error) {
@@ -55,6 +91,8 @@ func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) (*User, 
 		arg.Password,
 		arg.CreatedAt,
 		arg.CreatedBy,
+		arg.UpdatedAt,
+		arg.UpdatedBy,
 	)
 	var i User
 	err := row.Scan(
@@ -64,6 +102,43 @@ func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) (*User, 
 		&i.Password,
 		&i.CreatedAt,
 		&i.CreatedBy,
+		&i.UpdatedAt,
+		&i.UpdatedBy,
+	)
+	return &i, err
+}
+
+const updateUser = `-- name: UpdateUser :one
+UPDATE users
+SET name = $2, updated_at = $3, updated_by = $4
+WHERE id = $1
+RETURNING id, name, email, password, created_at, created_by, updated_at, updated_by
+`
+
+type UpdateUserParams struct {
+	ID        uuid.UUID `json:"id"`
+	Name      string    `json:"name"`
+	UpdatedAt time.Time `json:"updatedAt"`
+	UpdatedBy uuid.UUID `json:"updatedBy"`
+}
+
+func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (*User, error) {
+	row := q.db.QueryRow(ctx, updateUser,
+		arg.ID,
+		arg.Name,
+		arg.UpdatedAt,
+		arg.UpdatedBy,
+	)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Email,
+		&i.Password,
+		&i.CreatedAt,
+		&i.CreatedBy,
+		&i.UpdatedAt,
+		&i.UpdatedBy,
 	)
 	return &i, err
 }

@@ -2,11 +2,14 @@ package user
 
 import (
 	"context"
+	"github.com/pauloRohling/locknote/internal/domain/audit"
 	"github.com/pauloRohling/locknote/internal/domain/types/email"
+	"github.com/pauloRohling/locknote/internal/domain/types/id"
 	"github.com/pauloRohling/locknote/internal/domain/user"
 	"github.com/pauloRohling/locknote/internal/persistence/postgres"
 	"github.com/pauloRohling/locknote/internal/persistence/store"
 	"github.com/pauloRohling/locknote/pkg/transaction"
+	"time"
 )
 
 // Repository is the PostgreSQL implementation of [user.Repository]
@@ -37,6 +40,8 @@ func (repository *Repository) Save(ctx context.Context, user *user.User) (*user.
 		Password:  user.Password().String(),
 		CreatedAt: user.Audit().CreatedAt(),
 		CreatedBy: user.Audit().CreatedBy().UUID(),
+		UpdatedAt: user.Audit().UpdatedAt(),
+		UpdatedBy: user.Audit().UpdatedBy().UUID(),
 	})
 
 	if err != nil {
@@ -52,6 +57,39 @@ func (repository *Repository) FindByEmail(ctx context.Context, email email.Email
 		return nil, postgres.ThrowNotFound(err)
 	}
 	return repository.mapper.Parse(matchedUser)
+}
+
+func (repository *Repository) FindByID(ctx context.Context, userId id.ID) (*user.User, error) {
+	matchedUser, err := repository.query(ctx).FindUserByID(ctx, userId.UUID())
+	if err != nil {
+		return nil, postgres.ThrowNotFound(err)
+	}
+	return repository.mapper.Parse(matchedUser)
+}
+
+func (repository *Repository) Update(ctx context.Context, user *user.User) (*user.User, error) {
+	userId, err := audit.GetUserId(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	updatedUser, err := repository.query(ctx).UpdateUser(ctx, store.UpdateUserParams{
+		ID:        user.ID().UUID(),
+		Name:      user.Name().String(),
+		UpdatedAt: time.Now().UTC(),
+		UpdatedBy: userId.UUID(),
+	})
+
+	if err != nil {
+		return nil, postgres.Throw(err)
+	}
+
+	return repository.mapper.Parse(updatedUser)
+}
+
+func (repository *Repository) Delete(ctx context.Context, userId id.ID) error {
+	err := repository.query(ctx).DeleteUser(ctx, userId.UUID())
+	return postgres.Throw(err)
 }
 
 // Ensure the repository implements the [user.Repository] interface

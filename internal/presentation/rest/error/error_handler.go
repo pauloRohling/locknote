@@ -23,6 +23,10 @@ func NewErrorHandler(log *zap.Logger) echo.HTTPErrorHandler {
 			customError = throw.Internal().Err(err).Msgf("Unexpected error")
 		}
 
+		if errors.Is(err, echo.ErrNotFound) {
+			customError = throw.NotFound().Err(err).Msgf("Could not find resource")
+		}
+
 		instance := c.Request().URL.Path
 		requestID := c.Response().Header().Get(echo.HeaderXRequestID)
 		statusCode := throw.ErrorType(customError.Type()).StatusCode()

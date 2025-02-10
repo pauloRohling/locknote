@@ -37,7 +37,7 @@ func TestListNotesUseCase(t *testing.T) {
 				Pagination: pagination.Pagination{Page: 1, Size: 10},
 			},
 			setup: func(noteRepository *mocknote.MockRepository) {
-				noteRepository.EXPECT().FindAllNotes(mock.Anything, mock.Anything).Return([]*note.Note{mockNote}, nil)
+				noteRepository.EXPECT().FindAll(mock.Anything, mock.Anything).Return([]*note.Note{mockNote}, nil)
 			},
 		},
 		"should return an error if the note repository fails to find all notes": {
@@ -45,7 +45,7 @@ func TestListNotesUseCase(t *testing.T) {
 				Pagination: pagination.Pagination{Page: 1, Size: 10},
 			},
 			setup: func(noteRepository *mocknote.MockRepository) {
-				noteRepository.EXPECT().FindAllNotes(mock.Anything, mock.Anything).Return(nil, throw.Internal().Msg("failed to find notes"))
+				noteRepository.EXPECT().FindAll(mock.Anything, mock.Anything).Return(nil, throw.Internal().Msg("failed to find notes"))
 			},
 			expectErr: true,
 			errType:   throw.InternalErrorType,

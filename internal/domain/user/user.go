@@ -45,11 +45,15 @@ func (user *User) MarshalJSON() ([]byte, error) {
 		Email     email.Email     `json:"email"`
 		CreatedAt time.Time       `json:"createdAt"`
 		CreatedBy id.ID           `json:"createdBy"`
+		UpdatedAt time.Time       `json:"updatedAt"`
+		UpdatedBy id.ID           `json:"updatedBy"`
 	}{
 		ID:        user.id,
 		Name:      user.name,
 		Email:     user.email,
 		CreatedAt: user.audit.CreatedAt(),
 		CreatedBy: user.audit.CreatedBy(),
+		UpdatedAt: user.audit.UpdatedAt(),
+		UpdatedBy: user.audit.UpdatedBy(),
 	})
 }

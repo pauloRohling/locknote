@@ -24,9 +24,19 @@ func NewMapper(factory note.Factory) *DefaultMapper {
 }
 
 func (mapper *DefaultMapper) Parse(savedNote *store.Note) (*note.Note, error) {
+	createdBy, err := id.FromUUID(savedNote.CreatedBy)
+	if err != nil {
+		return nil, err
+	}
+
+	updatedBy, err := id.FromUUID(savedNote.UpdatedBy)
+	if err != nil {
+		return nil, err
+	}
+
 	return mapper.factory.Parse(note.ParseParams{
 		ID:    savedNote.ID,
-		Audit: audit.New(savedNote.CreatedAt, id.ID(savedNote.CreatedBy)),
+		Audit: audit.New(savedNote.CreatedAt, savedNote.UpdatedAt, createdBy, updatedBy),
 		NewParams: note.NewParams{
 			Title:   savedNote.Title,
 			Content: savedNote.Content,

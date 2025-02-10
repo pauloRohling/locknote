@@ -39,11 +39,15 @@ func (note *Note) MarshalJSON() ([]byte, error) {
 		Content   string     `json:"content"`
 		CreatedAt time.Time  `json:"createdAt"`
 		CreatedBy id.ID      `json:"createdBy"`
+		UpdatedAt time.Time  `json:"updatedAt"`
+		UpdatedBy id.ID      `json:"updatedBy"`
 	}{
 		ID:        note.id,
 		Title:     note.title,
 		Content:   note.content,
 		CreatedAt: note.audit.CreatedAt(),
 		CreatedBy: note.audit.CreatedBy(),
+		UpdatedAt: note.audit.UpdatedAt(),
+		UpdatedBy: note.audit.UpdatedBy(),
 	})
 }

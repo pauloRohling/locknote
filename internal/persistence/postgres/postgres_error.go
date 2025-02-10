@@ -14,6 +14,10 @@ const (
 )
 
 func Throw(err error) *throw.Error {
+	if err == nil {
+		return nil
+	}
+
 	var pgErr *pgconn.PgError
 	if !errors.As(err, &pgErr) {
 		return throw.Internal().Err(err).Msg(DefaultErrorMsg)
@@ -40,6 +44,10 @@ func Throw(err error) *throw.Error {
 }
 
 func ThrowNotFound(err error) *throw.Error {
+	if err == nil {
+		return nil
+	}
+
 	if errors.Is(err, pgx.ErrNoRows) {
 		return throw.NotFound().Err(err).Msg(NotFoundErrorMsg)
 	}

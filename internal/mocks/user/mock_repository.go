@@ -6,6 +6,8 @@ import (
 	context "context"
 
 	email "github.com/pauloRohling/locknote/internal/domain/types/email"
+	id "github.com/pauloRohling/locknote/internal/domain/types/id"
+
 	mock "github.com/stretchr/testify/mock"
 
 	user "github.com/pauloRohling/locknote/internal/domain/user"
@@ -22,6 +24,53 @@ type MockRepository_Expecter struct {
 
 func (_m *MockRepository) EXPECT() *MockRepository_Expecter {
 	return &MockRepository_Expecter{mock: &_m.Mock}
+}
+
+// Delete provides a mock function with given fields: ctx, userId
+func (_m *MockRepository) Delete(ctx context.Context, userId id.ID) error {
+	ret := _m.Called(ctx, userId)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Delete")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, id.ID) error); ok {
+		r0 = rf(ctx, userId)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// MockRepository_Delete_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Delete'
+type MockRepository_Delete_Call struct {
+	*mock.Call
+}
+
+// Delete is a helper method to define mock.On call
+//   - ctx context.Context
+//   - userId id.ID
+func (_e *MockRepository_Expecter) Delete(ctx interface{}, userId interface{}) *MockRepository_Delete_Call {
+	return &MockRepository_Delete_Call{Call: _e.mock.On("Delete", ctx, userId)}
+}
+
+func (_c *MockRepository_Delete_Call) Run(run func(ctx context.Context, userId id.ID)) *MockRepository_Delete_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(id.ID))
+	})
+	return _c
+}
+
+func (_c *MockRepository_Delete_Call) Return(_a0 error) *MockRepository_Delete_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockRepository_Delete_Call) RunAndReturn(run func(context.Context, id.ID) error) *MockRepository_Delete_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // FindByEmail provides a mock function with given fields: ctx, _a1
@@ -83,6 +132,65 @@ func (_c *MockRepository_FindByEmail_Call) RunAndReturn(run func(context.Context
 	return _c
 }
 
+// FindByID provides a mock function with given fields: ctx, userId
+func (_m *MockRepository) FindByID(ctx context.Context, userId id.ID) (*user.User, error) {
+	ret := _m.Called(ctx, userId)
+
+	if len(ret) == 0 {
+		panic("no return value specified for FindByID")
+	}
+
+	var r0 *user.User
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, id.ID) (*user.User, error)); ok {
+		return rf(ctx, userId)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, id.ID) *user.User); ok {
+		r0 = rf(ctx, userId)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*user.User)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, id.ID) error); ok {
+		r1 = rf(ctx, userId)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockRepository_FindByID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'FindByID'
+type MockRepository_FindByID_Call struct {
+	*mock.Call
+}
+
+// FindByID is a helper method to define mock.On call
+//   - ctx context.Context
+//   - userId id.ID
+func (_e *MockRepository_Expecter) FindByID(ctx interface{}, userId interface{}) *MockRepository_FindByID_Call {
+	return &MockRepository_FindByID_Call{Call: _e.mock.On("FindByID", ctx, userId)}
+}
+
+func (_c *MockRepository_FindByID_Call) Run(run func(ctx context.Context, userId id.ID)) *MockRepository_FindByID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(id.ID))
+	})
+	return _c
+}
+
+func (_c *MockRepository_FindByID_Call) Return(_a0 *user.User, _a1 error) *MockRepository_FindByID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockRepository_FindByID_Call) RunAndReturn(run func(context.Context, id.ID) (*user.User, error)) *MockRepository_FindByID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Save provides a mock function with given fields: ctx, _a1
 func (_m *MockRepository) Save(ctx context.Context, _a1 *user.User) (*user.User, error) {
 	ret := _m.Called(ctx, _a1)
@@ -138,6 +246,65 @@ func (_c *MockRepository_Save_Call) Return(_a0 *user.User, _a1 error) *MockRepos
 }
 
 func (_c *MockRepository_Save_Call) RunAndReturn(run func(context.Context, *user.User) (*user.User, error)) *MockRepository_Save_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Update provides a mock function with given fields: ctx, _a1
+func (_m *MockRepository) Update(ctx context.Context, _a1 *user.User) (*user.User, error) {
+	ret := _m.Called(ctx, _a1)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Update")
+	}
+
+	var r0 *user.User
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *user.User) (*user.User, error)); ok {
+		return rf(ctx, _a1)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *user.User) *user.User); ok {
+		r0 = rf(ctx, _a1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*user.User)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, *user.User) error); ok {
+		r1 = rf(ctx, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockRepository_Update_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Update'
+type MockRepository_Update_Call struct {
+	*mock.Call
+}
+
+// Update is a helper method to define mock.On call
+//   - ctx context.Context
+//   - _a1 *user.User
+func (_e *MockRepository_Expecter) Update(ctx interface{}, _a1 interface{}) *MockRepository_Update_Call {
+	return &MockRepository_Update_Call{Call: _e.mock.On("Update", ctx, _a1)}
+}
+
+func (_c *MockRepository_Update_Call) Run(run func(ctx context.Context, _a1 *user.User)) *MockRepository_Update_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(*user.User))
+	})
+	return _c
+}
+
+func (_c *MockRepository_Update_Call) Return(_a0 *user.User, _a1 error) *MockRepository_Update_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockRepository_Update_Call) RunAndReturn(run func(context.Context, *user.User) (*user.User, error)) *MockRepository_Update_Call {
 	_c.Call.Return(run)
 	return _c
 }

@@ -16,6 +16,8 @@ type Note struct {
 	Content   string    `json:"content"`
 	CreatedAt time.Time `json:"createdAt"`
 	CreatedBy uuid.UUID `json:"createdBy"`
+	UpdatedAt time.Time `json:"updatedAt"`
+	UpdatedBy uuid.UUID `json:"updatedBy"`
 }
 
 type User struct {
@@ -25,4 +27,6 @@ type User struct {
 	Password  string    `json:"password"`
 	CreatedAt time.Time `json:"createdAt"`
 	CreatedBy uuid.UUID `json:"createdBy"`
+	UpdatedAt time.Time `json:"updatedAt"`
+	UpdatedBy uuid.UUID `json:"updatedBy"`
 }
