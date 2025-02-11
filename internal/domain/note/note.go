@@ -32,6 +32,17 @@ func (note *Note) Audit() audit.Audit {
 	return note.audit
 }
 
+func (note *Note) Update(title string, content string) error {
+	newTitle, err := text.NewTitle(title)
+	if err != nil {
+		return err
+	}
+
+	note.title = newTitle
+	note.content = content
+	return nil
+}
+
 func (note *Note) MarshalJSON() ([]byte, error) {
 	return json.Marshal(struct {
 		ID        id.ID      `json:"id"`

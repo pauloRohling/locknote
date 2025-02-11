@@ -98,6 +98,9 @@ func main() {
 	deleteNoteUseCase := noteApplication.NewDeleteNoteUseCase(noteApplication.DeleteNoteParams{
 		NoteRepository: noteRepository,
 	})
+	updateNoteUseCase := noteApplication.NewUpdateNoteUseCase(noteApplication.UpdateNoteParams{
+		NoteRepository: noteRepository,
+	})
 
 	userService := userApplication.NewService(userApplication.FacadeServiceParams{
 		CreateUseCase: createUserUseCase,
@@ -108,6 +111,7 @@ func main() {
 		GetNoteUseCase:    getNoteUseCase,
 		ListNotesUseCase:  listNotesUseCase,
 		DeleteNoteUseCase: deleteNoteUseCase,
+		UpdateNoteUseCase: updateNoteUseCase,
 	})
 
 	userRestController := userPresentation.NewRestController(userService)

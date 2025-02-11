@@ -27,6 +27,7 @@ func (controller *RestController) Register(api *echo.Group) {
 	notesApi.GET("", controller.list, pagination.Middleware())
 	notesApi.GET("/:id", controller.getById)
 	notesApi.DELETE("/:id", controller.deleteById)
+	notesApi.PUT("/:id", controller.updateById)
 }
 
 // Ensure the controller implements the [rest.RegistrableRoute] interface
