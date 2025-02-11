@@ -13,7 +13,7 @@ const (
 	NotFoundErrorMsg = "No records found matching the given criteria"
 )
 
-func Throw(err error) *throw.Error {
+func Throw(err error) error {
 	if err == nil {
 		return nil
 	}
@@ -43,7 +43,7 @@ func Throw(err error) *throw.Error {
 	}
 }
 
-func ThrowNotFound(err error) *throw.Error {
+func ThrowNotFound(err error) error {
 	if err == nil {
 		return nil
 	}

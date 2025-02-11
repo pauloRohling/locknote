@@ -12,13 +12,13 @@ import (
 	"github.com/google/uuid"
 )
 
-const deleteUser = `-- name: DeleteUser :exec
+const deleteUserById = `-- name: DeleteUserById :exec
 DELETE FROM users
 WHERE id = $1
 `
 
-func (q *Queries) DeleteUser(ctx context.Context, id uuid.UUID) error {
-	_, err := q.db.Exec(ctx, deleteUser, id)
+func (q *Queries) DeleteUserById(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.Exec(ctx, deleteUserById, id)
 	return err
 }
 
@@ -108,22 +108,22 @@ func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) (*User, 
 	return &i, err
 }
 
-const updateUser = `-- name: UpdateUser :one
+const updateUserById = `-- name: UpdateUserById :one
 UPDATE users
 SET name = $2, updated_at = $3, updated_by = $4
 WHERE id = $1
 RETURNING id, name, email, password, created_at, created_by, updated_at, updated_by
 `
 
-type UpdateUserParams struct {
+type UpdateUserByIdParams struct {
 	ID        uuid.UUID `json:"id"`
 	Name      string    `json:"name"`
 	UpdatedAt time.Time `json:"updatedAt"`
 	UpdatedBy uuid.UUID `json:"updatedBy"`
 }
 
-func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (*User, error) {
-	row := q.db.QueryRow(ctx, updateUser,
+func (q *Queries) UpdateUserById(ctx context.Context, arg UpdateUserByIdParams) (*User, error) {
+	row := q.db.QueryRow(ctx, updateUserById,
 		arg.ID,
 		arg.Name,
 		arg.UpdatedAt,

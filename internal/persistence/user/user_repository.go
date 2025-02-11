@@ -32,23 +32,9 @@ func (repository *Repository) query(ctx context.Context) *store.Queries {
 	return store.New(repository.conn)
 }
 
-func (repository *Repository) Save(ctx context.Context, user *user.User) (*user.User, error) {
-	newUser, err := repository.query(ctx).InsertUser(ctx, store.InsertUserParams{
-		ID:        user.ID().UUID(),
-		Name:      user.Name().String(),
-		Email:     user.Email().String(),
-		Password:  user.Password().String(),
-		CreatedAt: user.Audit().CreatedAt(),
-		CreatedBy: user.Audit().CreatedBy().UUID(),
-		UpdatedAt: user.Audit().UpdatedAt(),
-		UpdatedBy: user.Audit().UpdatedBy().UUID(),
-	})
-
-	if err != nil {
-		return nil, postgres.Throw(err)
-	}
-
-	return repository.mapper.Parse(newUser)
+func (repository *Repository) DeleteById(ctx context.Context, userId id.ID) error {
+	err := repository.query(ctx).DeleteUserById(ctx, userId.UUID())
+	return postgres.Throw(err)
 }
 
 func (repository *Repository) FindByEmail(ctx context.Context, email email.Email) (*user.User, error) {
@@ -67,13 +53,13 @@ func (repository *Repository) FindByID(ctx context.Context, userId id.ID) (*user
 	return repository.mapper.Parse(matchedUser)
 }
 
-func (repository *Repository) Update(ctx context.Context, user *user.User) (*user.User, error) {
+func (repository *Repository) UpdateById(ctx context.Context, user *user.User) (*user.User, error) {
 	userId, err := audit.GetUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	updatedUser, err := repository.query(ctx).UpdateUser(ctx, store.UpdateUserParams{
+	updatedUser, err := repository.query(ctx).UpdateUserById(ctx, store.UpdateUserByIdParams{
 		ID:        user.ID().UUID(),
 		Name:      user.Name().String(),
 		UpdatedAt: time.Now().UTC(),
@@ -87,9 +73,23 @@ func (repository *Repository) Update(ctx context.Context, user *user.User) (*use
 	return repository.mapper.Parse(updatedUser)
 }
 
-func (repository *Repository) Delete(ctx context.Context, userId id.ID) error {
-	err := repository.query(ctx).DeleteUser(ctx, userId.UUID())
-	return postgres.Throw(err)
+func (repository *Repository) Save(ctx context.Context, user *user.User) (*user.User, error) {
+	newUser, err := repository.query(ctx).InsertUser(ctx, store.InsertUserParams{
+		ID:        user.ID().UUID(),
+		Name:      user.Name().String(),
+		Email:     user.Email().String(),
+		Password:  user.Password().String(),
+		CreatedAt: user.Audit().CreatedAt(),
+		CreatedBy: user.Audit().CreatedBy().UUID(),
+		UpdatedAt: user.Audit().UpdatedAt(),
+		UpdatedBy: user.Audit().UpdatedBy().UUID(),
+	})
+
+	if err != nil {
+		return nil, postgres.Throw(err)
+	}
+
+	return repository.mapper.Parse(newUser)
 }
 
 // Ensure the repository implements the [user.Repository] interface

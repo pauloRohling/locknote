@@ -16,14 +16,14 @@ ORDER BY created_at DESC
 LIMIT $2
 OFFSET $3;
 
--- name: UpdateNote :one
+-- name: UpdateNoteById :one
 UPDATE notes
 SET title = $3, content = $4, updated_at = $5, updated_by = $6
 WHERE id = $1
   AND created_by = $2
 RETURNING *;
 
--- name: DeleteNote :exec
+-- name: DeleteNoteById :exec
 DELETE FROM notes
 WHERE id = $1
   AND created_by = $2;

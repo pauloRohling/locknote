@@ -13,12 +13,12 @@ SELECT *
 FROM users
 WHERE id = $1;
 
--- name: UpdateUser :one
+-- name: UpdateUserById :one
 UPDATE users
 SET name = $2, updated_at = $3, updated_by = $4
 WHERE id = $1
 RETURNING *;
 
--- name: DeleteUser :exec
+-- name: DeleteUserById :exec
 DELETE FROM users
 WHERE id = $1;

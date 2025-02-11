@@ -12,19 +12,19 @@ import (
 	"github.com/google/uuid"
 )
 
-const deleteNote = `-- name: DeleteNote :exec
+const deleteNoteById = `-- name: DeleteNoteById :exec
 DELETE FROM notes
 WHERE id = $1
   AND created_by = $2
 `
 
-type DeleteNoteParams struct {
+type DeleteNoteByIdParams struct {
 	ID        uuid.UUID `json:"id"`
 	CreatedBy uuid.UUID `json:"createdBy"`
 }
 
-func (q *Queries) DeleteNote(ctx context.Context, arg DeleteNoteParams) error {
-	_, err := q.db.Exec(ctx, deleteNote, arg.ID, arg.CreatedBy)
+func (q *Queries) DeleteNoteById(ctx context.Context, arg DeleteNoteByIdParams) error {
+	_, err := q.db.Exec(ctx, deleteNoteById, arg.ID, arg.CreatedBy)
 	return err
 }
 
@@ -146,7 +146,7 @@ func (q *Queries) InsertNote(ctx context.Context, arg InsertNoteParams) (*Note, 
 	return &i, err
 }
 
-const updateNote = `-- name: UpdateNote :one
+const updateNoteById = `-- name: UpdateNoteById :one
 UPDATE notes
 SET title = $3, content = $4, updated_at = $5, updated_by = $6
 WHERE id = $1
@@ -154,7 +154,7 @@ WHERE id = $1
 RETURNING id, title, content, created_at, created_by, updated_at, updated_by
 `
 
-type UpdateNoteParams struct {
+type UpdateNoteByIdParams struct {
 	ID        uuid.UUID `json:"id"`
 	CreatedBy uuid.UUID `json:"createdBy"`
 	Title     string    `json:"title"`
@@ -163,8 +163,8 @@ type UpdateNoteParams struct {
 	UpdatedBy uuid.UUID `json:"updatedBy"`
 }
 
-func (q *Queries) UpdateNote(ctx context.Context, arg UpdateNoteParams) (*Note, error) {
-	row := q.db.QueryRow(ctx, updateNote,
+func (q *Queries) UpdateNoteById(ctx context.Context, arg UpdateNoteByIdParams) (*Note, error) {
+	row := q.db.QueryRow(ctx, updateNoteById,
 		arg.ID,
 		arg.CreatedBy,
 		arg.Title,

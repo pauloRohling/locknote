@@ -32,41 +32,23 @@ func (repository *Repository) query(ctx context.Context) *store.Queries {
 	return store.New(repository.conn)
 }
 
-func (repository *Repository) Save(ctx context.Context, note *note.Note) (*note.Note, error) {
-	newNote, err := repository.query(ctx).InsertNote(ctx, store.InsertNoteParams{
-		ID:        note.ID().UUID(),
-		Title:     note.Title().String(),
-		Content:   note.Content(),
-		CreatedAt: note.Audit().CreatedAt(),
-		CreatedBy: note.Audit().CreatedBy().UUID(),
-		UpdatedAt: note.Audit().UpdatedAt(),
-		UpdatedBy: note.Audit().UpdatedBy().UUID(),
-	})
-
-	if err != nil {
-		return nil, postgres.Throw(err)
-	}
-
-	return repository.mapper.Parse(newNote)
+func (repository *Repository) DeleteAllByUser(ctx context.Context, userId id.ID) error {
+	err := repository.query(ctx).DeleteNotesByUser(ctx, userId.UUID())
+	return postgres.Throw(err)
 }
 
-func (repository *Repository) FindByID(ctx context.Context, id id.ID) (*note.Note, error) {
+func (repository *Repository) DeleteById(ctx context.Context, noteId id.ID) error {
 	userId, err := audit.GetUserId(ctx)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	params := store.FindNoteByIDParams{
-		ID:        id.UUID(),
+	err = repository.query(ctx).DeleteNoteById(ctx, store.DeleteNoteByIdParams{
+		ID:        noteId.UUID(),
 		CreatedBy: userId.UUID(),
-	}
+	})
 
-	matchedNote, err := repository.query(ctx).FindNoteByID(ctx, params)
-	if err != nil {
-		return nil, postgres.ThrowNotFound(err)
-	}
-
-	return repository.mapper.Parse(matchedNote)
+	return postgres.Throw(err)
 }
 
 func (repository *Repository) FindAll(ctx context.Context, pagination pagination.Pagination) ([]*note.Note, error) {
@@ -89,13 +71,50 @@ func (repository *Repository) FindAll(ctx context.Context, pagination pagination
 	return repository.mapper.ParseMany(matchedNotes)
 }
 
-func (repository *Repository) Update(ctx context.Context, note *note.Note) (*note.Note, error) {
+func (repository *Repository) FindByID(ctx context.Context, id id.ID) (*note.Note, error) {
 	userId, err := audit.GetUserId(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	params := store.UpdateNoteParams{
+	params := store.FindNoteByIDParams{
+		ID:        id.UUID(),
+		CreatedBy: userId.UUID(),
+	}
+
+	matchedNote, err := repository.query(ctx).FindNoteByID(ctx, params)
+	if err != nil {
+		return nil, postgres.ThrowNotFound(err)
+	}
+
+	return repository.mapper.Parse(matchedNote)
+}
+
+func (repository *Repository) Save(ctx context.Context, note *note.Note) (*note.Note, error) {
+	newNote, err := repository.query(ctx).InsertNote(ctx, store.InsertNoteParams{
+		ID:        note.ID().UUID(),
+		Title:     note.Title().String(),
+		Content:   note.Content(),
+		CreatedAt: note.Audit().CreatedAt(),
+		CreatedBy: note.Audit().CreatedBy().UUID(),
+		UpdatedAt: note.Audit().UpdatedAt(),
+		UpdatedBy: note.Audit().UpdatedBy().UUID(),
+	})
+
+	if err != nil {
+		return nil, postgres.Throw(err)
+	}
+
+	return repository.mapper.Parse(newNote)
+}
+
+func (repository *Repository) UpdateById(ctx context.Context, note *note.Note) (*note.Note, error) {
+	userId, err := audit.GetUserId(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	params := store.UpdateNoteByIdParams{
 		ID:        note.ID().UUID(),
 		CreatedBy: userId.UUID(),
 		Title:     note.Title().String(),
@@ -104,31 +123,12 @@ func (repository *Repository) Update(ctx context.Context, note *note.Note) (*not
 		UpdatedBy: userId.UUID(),
 	}
 
-	updatedNote, err := repository.query(ctx).UpdateNote(ctx, params)
+	updatedNote, err := repository.query(ctx).UpdateNoteById(ctx, params)
 	if err != nil {
 		return nil, postgres.Throw(err)
 	}
 
 	return repository.mapper.Parse(updatedNote)
-}
-
-func (repository *Repository) Delete(ctx context.Context, noteId id.ID) error {
-	userId, err := audit.GetUserId(ctx)
-	if err != nil {
-		return err
-	}
-
-	err = repository.query(ctx).DeleteNote(ctx, store.DeleteNoteParams{
-		ID:        noteId.UUID(),
-		CreatedBy: userId.UUID(),
-	})
-
-	return postgres.Throw(err)
-}
-
-func (repository *Repository) DeleteAllByUser(ctx context.Context, userId id.ID) error {
-	err := repository.query(ctx).DeleteNotesByUser(ctx, userId.UUID())
-	return postgres.Throw(err)
 }
 
 // Ensure the repository implements the [note.Repository] interface

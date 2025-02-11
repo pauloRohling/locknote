@@ -7,10 +7,10 @@ import (
 )
 
 type Repository interface {
-	Save(ctx context.Context, note *Note) (*Note, error)
-	FindByID(ctx context.Context, id id.ID) (*Note, error)
-	FindAll(ctx context.Context, pagination pagination.Pagination) ([]*Note, error)
-	Update(ctx context.Context, note *Note) (*Note, error)
-	Delete(ctx context.Context, noteId id.ID) error
 	DeleteAllByUser(ctx context.Context, userId id.ID) error
+	DeleteById(ctx context.Context, noteId id.ID) error
+	FindAll(ctx context.Context, pagination pagination.Pagination) ([]*Note, error)
+	FindByID(ctx context.Context, id id.ID) (*Note, error)
+	Save(ctx context.Context, note *Note) (*Note, error)
+	UpdateById(ctx context.Context, note *Note) (*Note, error)
 }

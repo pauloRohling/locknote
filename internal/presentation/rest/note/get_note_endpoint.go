@@ -8,7 +8,7 @@ import (
 )
 
 type GetNoteRequest struct {
-	NoteID string `json:"noteId"`
+	NoteID string `json:"id"`
 }
 
 type GetNoteResponse struct {

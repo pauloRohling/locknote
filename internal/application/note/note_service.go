@@ -6,12 +6,14 @@ type Service interface {
 	Create(ctx context.Context, input *CreateNoteInput) (*CreateNoteOutput, error)
 	GetById(ctx context.Context, input *GetNoteInput) (*GetNoteOutput, error)
 	List(ctx context.Context, input *ListNotesInput) (*ListNotesOutput, error)
+	DeleteById(ctx context.Context, input *DeleteNoteInput) (*DeleteNoteOutput, error)
 }
 
 type FacadeServiceParams struct {
 	CreateNoteUseCase *CreateNoteUseCase
 	GetNoteUseCase    *GetNoteUseCase
 	ListNotesUseCase  *ListNotesUseCase
+	DeleteNoteUseCase *DeleteNoteUseCase
 }
 
 type FacadeService struct {
@@ -32,6 +34,10 @@ func (service *FacadeService) GetById(ctx context.Context, input *GetNoteInput) 
 
 func (service *FacadeService) List(ctx context.Context, input *ListNotesInput) (*ListNotesOutput, error) {
 	return service.ListNotesUseCase.Execute(ctx, input)
+}
+
+func (service *FacadeService) DeleteById(ctx context.Context, input *DeleteNoteInput) (*DeleteNoteOutput, error) {
+	return service.DeleteNoteUseCase.Execute(ctx, input)
 }
 
 // Ensure the service implements the [note.Service] interface
