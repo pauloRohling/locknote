@@ -21,3 +21,6 @@ This project was created as an experiment about how to build a REST API using [P
 - [Mockery](https://github.com/vektra/mockery)
 - [Sqlc](https://github.com/kyleconroy/sqlc)
 
+## License
+
+LockNote is released under the MIT License. See the [LICENSE](LICENSE) file for more information.
