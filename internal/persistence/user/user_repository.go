@@ -37,16 +37,21 @@ func (repository *Repository) DeleteById(ctx context.Context, userId id.ID) erro
 	return postgres.Throw(err)
 }
 
-func (repository *Repository) FindByEmail(ctx context.Context, email email.Email) (*user.User, error) {
-	matchedUser, err := repository.query(ctx).FindUserByEmail(ctx, email.String())
+func (repository *Repository) Find(ctx context.Context) (*user.User, error) {
+	userId, err := audit.GetUserId(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	matchedUser, err := repository.query(ctx).FindUserByID(ctx, userId.UUID())
 	if err != nil {
 		return nil, postgres.ThrowNotFound(err)
 	}
 	return repository.mapper.Parse(matchedUser)
 }
 
-func (repository *Repository) FindByID(ctx context.Context, userId id.ID) (*user.User, error) {
-	matchedUser, err := repository.query(ctx).FindUserByID(ctx, userId.UUID())
+func (repository *Repository) FindByEmail(ctx context.Context, email email.Email) (*user.User, error) {
+	matchedUser, err := repository.query(ctx).FindUserByEmail(ctx, email.String())
 	if err != nil {
 		return nil, postgres.ThrowNotFound(err)
 	}

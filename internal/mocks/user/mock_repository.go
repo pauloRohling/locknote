@@ -73,6 +73,64 @@ func (_c *MockRepository_DeleteById_Call) RunAndReturn(run func(context.Context,
 	return _c
 }
 
+// Find provides a mock function with given fields: ctx
+func (_m *MockRepository) Find(ctx context.Context) (*user.User, error) {
+	ret := _m.Called(ctx)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Find")
+	}
+
+	var r0 *user.User
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context) (*user.User, error)); ok {
+		return rf(ctx)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context) *user.User); ok {
+		r0 = rf(ctx)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*user.User)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockRepository_Find_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Find'
+type MockRepository_Find_Call struct {
+	*mock.Call
+}
+
+// Find is a helper method to define mock.On call
+//   - ctx context.Context
+func (_e *MockRepository_Expecter) Find(ctx interface{}) *MockRepository_Find_Call {
+	return &MockRepository_Find_Call{Call: _e.mock.On("Find", ctx)}
+}
+
+func (_c *MockRepository_Find_Call) Run(run func(ctx context.Context)) *MockRepository_Find_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context))
+	})
+	return _c
+}
+
+func (_c *MockRepository_Find_Call) Return(_a0 *user.User, _a1 error) *MockRepository_Find_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockRepository_Find_Call) RunAndReturn(run func(context.Context) (*user.User, error)) *MockRepository_Find_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // FindByEmail provides a mock function with given fields: ctx, _a1
 func (_m *MockRepository) FindByEmail(ctx context.Context, _a1 email.Email) (*user.User, error) {
 	ret := _m.Called(ctx, _a1)
@@ -128,65 +186,6 @@ func (_c *MockRepository_FindByEmail_Call) Return(_a0 *user.User, _a1 error) *Mo
 }
 
 func (_c *MockRepository_FindByEmail_Call) RunAndReturn(run func(context.Context, email.Email) (*user.User, error)) *MockRepository_FindByEmail_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// FindByID provides a mock function with given fields: ctx, userId
-func (_m *MockRepository) FindByID(ctx context.Context, userId id.ID) (*user.User, error) {
-	ret := _m.Called(ctx, userId)
-
-	if len(ret) == 0 {
-		panic("no return value specified for FindByID")
-	}
-
-	var r0 *user.User
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, id.ID) (*user.User, error)); ok {
-		return rf(ctx, userId)
-	}
-	if rf, ok := ret.Get(0).(func(context.Context, id.ID) *user.User); ok {
-		r0 = rf(ctx, userId)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*user.User)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(context.Context, id.ID) error); ok {
-		r1 = rf(ctx, userId)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// MockRepository_FindByID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'FindByID'
-type MockRepository_FindByID_Call struct {
-	*mock.Call
-}
-
-// FindByID is a helper method to define mock.On call
-//   - ctx context.Context
-//   - userId id.ID
-func (_e *MockRepository_Expecter) FindByID(ctx interface{}, userId interface{}) *MockRepository_FindByID_Call {
-	return &MockRepository_FindByID_Call{Call: _e.mock.On("FindByID", ctx, userId)}
-}
-
-func (_c *MockRepository_FindByID_Call) Run(run func(ctx context.Context, userId id.ID)) *MockRepository_FindByID_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(id.ID))
-	})
-	return _c
-}
-
-func (_c *MockRepository_FindByID_Call) Return(_a0 *user.User, _a1 error) *MockRepository_FindByID_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *MockRepository_FindByID_Call) RunAndReturn(run func(context.Context, id.ID) (*user.User, error)) *MockRepository_FindByID_Call {
 	_c.Call.Return(run)
 	return _c
 }

@@ -77,20 +77,26 @@ func main() {
 	userRepository := userPersistence.NewRepository(dbPool, userMapper)
 	noteRepository := notePersistence.NewRepository(dbPool, noteMapper)
 
+	// User
 	createUserUseCase := userApplication.NewCreateUserUseCase(userApplication.CreateUserParams{
 		UserFactory:    userFactory,
 		UserRepository: userRepository,
 	})
+	getUserUseCase := userApplication.NewGetUserUseCase(userApplication.GetUserParams{
+		UserRepository: userRepository,
+	})
+	loginUseCase := userApplication.NewLoginUseCase(userApplication.LoginUsecaseParams{
+		TokenIssuer:    tokenIssuer,
+		UserRepository: userRepository,
+	})
+
+	// Note
 	createNoteUseCase := noteApplication.NewCreateNoteUseCase(noteApplication.CreateNoteParams{
 		NoteFactory:    noteFactory,
 		NoteRepository: noteRepository,
 	})
 	getNoteUseCase := noteApplication.NewGetNoteUseCase(noteApplication.GetNoteParams{
 		NoteRepository: noteRepository,
-	})
-	loginUseCase := userApplication.NewLoginUseCase(userApplication.LoginUsecaseParams{
-		TokenIssuer:    tokenIssuer,
-		UserRepository: userRepository,
 	})
 	listNotesUseCase := noteApplication.NewListNotesUseCase(noteApplication.ListNotesParams{
 		NoteRepository: noteRepository,
@@ -105,6 +111,7 @@ func main() {
 	userService := userApplication.NewService(userApplication.FacadeServiceParams{
 		CreateUseCase: createUserUseCase,
 		LoginUseCase:  loginUseCase,
+		GetUseCase:    getUserUseCase,
 	})
 	noteService := noteApplication.NewService(noteApplication.FacadeServiceParams{
 		CreateNoteUseCase: createNoteUseCase,
@@ -114,7 +121,7 @@ func main() {
 		UpdateNoteUseCase: updateNoteUseCase,
 	})
 
-	userRestController := userPresentation.NewRestController(userService)
+	userRestController := userPresentation.NewRestController(userService, tokenVerifierMiddleware)
 	noteRestController := notePresentation.NewRestController(noteService, tokenVerifierMiddleware)
 
 	server := rest.NewWebServer(env.Server.Port)

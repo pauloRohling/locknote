@@ -8,16 +8,21 @@ import (
 
 // RestController defines the REST API for the [user.Service]
 type RestController struct {
-	service user.Service
+	service       user.Service
+	tokenVerifier echo.MiddlewareFunc
 }
 
-func NewRestController(service user.Service) *RestController {
-	return &RestController{service: service}
+func NewRestController(service user.Service, tokenVerifier echo.MiddlewareFunc) *RestController {
+	return &RestController{
+		service:       service,
+		tokenVerifier: tokenVerifier,
+	}
 }
 
 func (controller *RestController) Register(api *echo.Group) {
 	usersApi := api.Group("/users")
 	usersApi.POST("", controller.create)
+	usersApi.GET("", controller.get, controller.tokenVerifier)
 	usersApi.POST("/login", controller.login)
 }
 
